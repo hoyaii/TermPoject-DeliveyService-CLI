@@ -47,4 +47,19 @@ public class Database {
             e.printStackTrace();
         }
     }
+
+    public boolean checkLogin(String username, String password) {
+        String sql = "SELECT * FROM User WHERE username = ? AND password = ?";
+        try {
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
