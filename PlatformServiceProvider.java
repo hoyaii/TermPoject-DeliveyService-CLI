@@ -21,4 +21,19 @@ public class PlatformServiceProvider {
             e.printStackTrace();
         }
     }
+
+    public void updateUser(int userId, String username, String password, String role) {
+        String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            preparedStatement.setString(3, role);
+            preparedStatement.setInt(4, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
 }
