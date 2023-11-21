@@ -171,7 +171,10 @@ class Main {
                     System.out.println("음식점 정보 업데이트에 실패하였습니다.");
                 }
                 break;
-            // ...
+                
+            case 3:
+                restaurantOwner.manageMenu();
+                break;
         }
     }
 
