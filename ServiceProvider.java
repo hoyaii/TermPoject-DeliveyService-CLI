@@ -28,7 +28,7 @@ public class ServiceProvider {
         }
     }
 
-    public Integer getUserIdByEmail(String email) {
+    public Integer getUserIdByEmail(String email) { // userId 구하기
         String sql = "SELECT user_id FROM User WHERE email = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);

@@ -12,8 +12,27 @@ public class RestaurantOwner {
         this.ownerId = ownerId;  // ownerId 초기화
     }
 
+    public Integer getRestaurantIdByName(String name) {
+        String sql = "SELECT restaurant_id FROM Restaurant WHERE name = ? AND owner_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, this.ownerId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("restaurant_id");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public boolean registerRestaurant(String name, String address, String cuisineType) {
-        String sql = "INSERT INTO Restaurant (name, address, cuisine_type) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Restaurant (name, address, cuisine_type, owner_id) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
@@ -29,14 +48,14 @@ public class RestaurantOwner {
         }
     }
 
-    public boolean updateRestaurantInfo(String name, String address, String cuisineType) {
+    public boolean updateRestaurantInfo(int restaurantId, String name, String address, String cuisineType) {
         String sql = "UPDATE Restaurant SET name = ?, address = ?, cuisine_type = ? WHERE owner_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, address);
             preparedStatement.setString(3, cuisineType);
-            preparedStatement.setInt(4, this.ownerId);
+            preparedStatement.setInt(4, restaurantId);
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {

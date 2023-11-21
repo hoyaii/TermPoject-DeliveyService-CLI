@@ -153,6 +153,8 @@ class Main {
                 break;
 
             case 2:
+                System.out.println("기존의 음식점의 이름을 입력해 주세요:");
+                String restaurantName = scanner.nextLine();
                 System.out.println("업데이트할 음식점의 이름을 입력해 주세요:");
                 String updateName = scanner.nextLine();
                 System.out.println("업데이트할 음식점의 위치를 입력해 주세요:");
@@ -160,7 +162,9 @@ class Main {
                 System.out.println("업데이트할 음식점의 음식 종류를 입력해 주세요:");
                 String updateType = scanner.nextLine();
 
-                boolean updateSuccess = restaurantOwner.updateRestaurantInfo(updateName, updateLocation, updateType);
+                Integer restaurantId = restaurantOwner.getRestaurantIdByName(restaurantName); // restaurantId를 구한다
+
+                boolean updateSuccess = restaurantOwner.updateRestaurantInfo(restaurantId, updateName, updateLocation, updateType);
                 if (updateSuccess) {
                     System.out.println("음식점 정보가 성공적으로 업데이트되었습니다.");
                 } else {
