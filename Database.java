@@ -62,4 +62,19 @@ public class Database {
             return false;
         }
     }
+
+    public ResultSet searchRestaurants(String name, String address, String cuisineType) {
+        String sql = "SELECT * FROM Restaurant WHERE name LIKE ? AND address LIKE ? AND cuisine_type LIKE ?";
+        try {
+            PreparedStatement preparedStatement = this.connection.prepareStatement(sql);
+            preparedStatement.setString(1, "%" + name + "%"); // SQL의 LIKE 연산자를 사용하여 부분 일치 검색을 수행
+            preparedStatement.setString(2, "%" + address + "%");
+            preparedStatement.setString(3, "%" + cuisineType + "%");
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

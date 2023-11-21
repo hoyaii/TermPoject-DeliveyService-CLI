@@ -17,6 +17,11 @@ class Main {
             System.out.println("Login failed.");
         }
 
+        /*
+        Customer customer = new Customer(db);
+        customer.searchRestaurants();
+         */
+
         db.close();
         scanner.close();
     }
