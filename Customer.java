@@ -39,4 +39,19 @@ public class Customer {
             return null;
         }
     }
+
+    public boolean orderMenu(int restaurantId, int menuId) {
+        String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            preparedStatement.setInt(2, menuId);
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
