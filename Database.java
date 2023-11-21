@@ -1,7 +1,7 @@
 import java.sql.*;
 
 public class Database {
-    private Connection connection;
+    Connection connection;
 
     public Database(String url, String username, String password) {
         try {
