@@ -138,4 +138,36 @@ public class Customer {
             System.out.println("주문 ID가 잘못되었거나, 배달 상태를 확인할 수 없습니다.");
         }
     }
+
+    public void writeReview(String restaurantName, int rating, String reviewContent) {
+        String sql = "INSERT INTO Reviews (restaurant_name, rating, content) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, restaurantName);
+            preparedStatement.setInt(2, rating);
+            preparedStatement.setString(3, reviewContent);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                System.out.println("리뷰가 성공적으로 작성되었습니다.");
+            } else {
+                System.out.println("리뷰 작성에 실패하였습니다.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
+    public void writeReviewService(){
+        System.out.println("리뷰를 작성할 음식점의 이름을 입력해 주세요:");
+        String restaurantName = scanner.nextLine();
+        System.out.println("리뷰의 별점을 입력해 주세요:");
+        int rating = scanner.nextInt();
+        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        System.out.println("리뷰 내용을 입력해 주세요:");
+        String reviewContent = scanner.nextLine();
+
+        writeReview(restaurantName, rating, reviewContent);
+    }
 }

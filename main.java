@@ -64,6 +64,14 @@ class Main {
             case 3:
                 customer.getDeliveryStatusService();
                 break;
+
+            case 4:
+                customer.writeReviewService();
+                break;
+
+            default:
+                System.out.println("잘못된 선택입니다.");
+                break;
         }
     }
 
