@@ -137,43 +137,27 @@ class Main {
 
         switch (option) {
             case 1:
-                System.out.println("등록할 음식점의 이름을 입력해 주세요:");
-                String registerName = scanner.nextLine();
-                System.out.println("등록할 음식점의 위치를 입력해 주세요:");
-                String registerLocation = scanner.nextLine();
-                System.out.println("등록할 음식점의 음식 종류를 입력해 주세요:");
-                String registerType = scanner.nextLine();
-
-                boolean registerSuccess = restaurantOwner.registerRestaurant(registerName, registerLocation, registerType);
-                if (registerSuccess) {
-                    System.out.println("음식점 정보가 성공적으로 등록되었습니다.");
-                } else {
-                    System.out.println("음식점 정보 등록에 실패하였습니다.");
-                }
+                restaurantOwner.registerRestaurantService();
                 break;
 
             case 2:
-                System.out.println("기존의 음식점의 이름을 입력해 주세요:");
-                String restaurantName = scanner.nextLine();
-                System.out.println("업데이트할 음식점의 이름을 입력해 주세요:");
-                String updateName = scanner.nextLine();
-                System.out.println("업데이트할 음식점의 위치를 입력해 주세요:");
-                String updateLocation = scanner.nextLine();
-                System.out.println("업데이트할 음식점의 음식 종류를 입력해 주세요:");
-                String updateType = scanner.nextLine();
-
-                Integer restaurantId = restaurantOwner.getRestaurantIdByName(restaurantName); // restaurantId를 구한다
-
-                boolean updateSuccess = restaurantOwner.updateRestaurantInfo(restaurantId, updateName, updateLocation, updateType);
-                if (updateSuccess) {
-                    System.out.println("음식점 정보가 성공적으로 업데이트되었습니다.");
-                } else {
-                    System.out.println("음식점 정보 업데이트에 실패하였습니다.");
-                }
+                restaurantOwner.updateRestaurantInfoService();
                 break;
-                
+
             case 3:
-                restaurantOwner.manageMenu();
+                restaurantOwner.manageMenuService();
+                break;
+
+            case 4:
+                restaurantOwner.manageOrderService();
+                break;
+
+            case 5:
+                restaurantOwner.getOrderHistoryService();
+                break;
+
+            default:
+                System.out.println("잘못된 선택입니다.");
                 break;
         }
     }
