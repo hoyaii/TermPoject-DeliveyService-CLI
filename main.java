@@ -18,22 +18,52 @@ class Main {
         if (role == null) {
             System.out.println("Invalid username or password.");
         } else if (role.equals("Customer")) {
-            Customer customer = new Customer(db);
-            // Call customer methods
+            handleCustomer(db);
+
         } else if (role.equals("RestaurantOwner")) {
-            RestaurantOwner restaurantOwner = new RestaurantOwner(db);
-            // Call restaurant owner methods
+            handleRestaurantOwner(db);
+
+
         } else if (role.equals("DeliveryPerson")) {
-            DeliveryPerson deliveryPerson = new DeliveryPerson(db);
-            // Call delivery person methods
-        } else if (role.equals(""))
+            handleDeliveryPerson(db);
+
+
+        } else if (role.equals("ServiceProvider")){
+            handleServiceProvider();
+        }
 
 
         db.close();
         scanner.close();
     }
-}
 
+    public static void handleCustomer(Database db) {
+        Customer customer = new Customer(db);
+        // Call customer methods
+        // customer.searchRestaurants("Restaurant Name", "Location", "Type");
+        // ...
+    }
+
+    public static void handleRestaurantOwner(Database db) {
+        RestaurantOwner restaurantOwner = new RestaurantOwner(db);
+        // Call restaurant owner methods
+        // restaurantOwner.registerRestaurant("Restaurant Name", "Location", "Type");
+        // ...
+    }
+
+    public static void handleDeliveryPerson(Database db) {
+        DeliveryPerson deliveryPerson = new DeliveryPerson(db);
+        // Call delivery person methods
+        // deliveryPerson.updateDeliveryStatus(1, "Delivered");
+        // ...
+    }
+
+    public static void handleServiceProvider() {
+        // Call delivery person methods
+        // deliveryPerson.updateDeliveryStatus(1, "Delivered");
+        // ...
+    }
+}
 
 
 

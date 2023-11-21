@@ -9,6 +9,25 @@ public class ServiceProvider {
         this.db = db;
     }
 
+    public String login(String username, String password) {
+        String sql = "SELECT role FROM User WHERE username = ? AND password = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("role");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void registerUser(String username, String password, String role) {
         String sql = "INSERT INTO User (username, password, role) VALUES (?, ?, ?)";
         try {
@@ -47,25 +66,6 @@ public class ServiceProvider {
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
-        }
-    }
-
-    public String login(String username, String password) {
-        String sql = "SELECT role FROM User WHERE username = ? AND password = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getString("role");
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-            return null;
         }
     }
 }
