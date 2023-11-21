@@ -1,10 +1,11 @@
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PlatformServiceProvider {
+public class ServiceProvider {
     private Database db;
 
-    public PlatformServiceProvider(Database db) {
+    public ServiceProvider(Database db) {
         this.db = db;
     }
 
@@ -46,6 +47,25 @@ public class PlatformServiceProvider {
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
+        }
+    }
+
+    public String login(String username, String password) {
+        String sql = "SELECT role FROM User WHERE username = ? AND password = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("role");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
         }
     }
 }
