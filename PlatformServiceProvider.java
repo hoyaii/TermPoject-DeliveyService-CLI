@@ -36,4 +36,16 @@ public class PlatformServiceProvider {
             e.printStackTrace();
         }
     }
+
+    public void deleteUser(int userId) {
+        String sql = "DELETE FROM User WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
 }
