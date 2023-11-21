@@ -74,7 +74,6 @@ class Main {
                     e.printStackTrace();
                 }
                 break;
-            // 추가적인 기능 구현
 
             case 2:
                 System.out.println("주문하실 음식점의 ID를 입력해 주세요:");
@@ -103,6 +102,19 @@ class Main {
                     System.out.println("주문이 성공적으로 완료되었습니다.");
                 } else {
                     System.out.println("주문에 실패하였습니다.");
+                }
+                break;
+
+            case 3:
+                System.out.println("배달 상태를 확인하고 싶은 주문의 ID를 입력해 주세요:");
+                int orderId = scanner.nextInt();
+                scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+
+                String deliveryStatus = customer.getDeliveryStatus(orderId);
+                if (deliveryStatus != null) {
+                    System.out.println("배달 상태: " + deliveryStatus);
+                } else {
+                    System.out.println("주문 ID가 잘못되었거나, 배달 상태를 확인할 수 없습니다.");
                 }
                 break;
         }

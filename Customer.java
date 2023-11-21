@@ -41,7 +41,7 @@ public class Customer {
     }
 
     public boolean orderMenu(int restaurantId, int menuId) {
-        String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)";
+        String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)"; // ******** 수정 필요, 배달원과 동기화
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, restaurantId);
@@ -52,6 +52,24 @@ public class Customer {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public String getDeliveryStatus(int orderId) {
+        String sql = "SELECT delivery_status FROM Orders WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("delivery_status");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
         }
     }
 }
