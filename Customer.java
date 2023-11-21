@@ -26,4 +26,17 @@ public class Customer {
             return null;
         }
     }
+
+    public ResultSet getMenu(int restaurantId) {
+        String sql = "SELECT * FROM Menu WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
