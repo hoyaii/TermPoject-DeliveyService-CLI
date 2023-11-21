@@ -1,12 +1,15 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class ServiceProvider {
     private Database db;
+    private Scanner scanner;
 
     public ServiceProvider(Database db) {
         this.db = db;
+        this.scanner = new Scanner(System.in);
     }
 
     public String login(String email, String password) {
@@ -61,6 +64,19 @@ public class ServiceProvider {
         }
     }
 
+    public void registerUserService(){
+        System.out.println("등록할 유저의 이메일을 입력해 주세요:");
+        String email = scanner.nextLine();
+        System.out.println("등록할 유저의 이름을 입력해 주세요:");
+        String username = scanner.nextLine();
+        System.out.println("등록할 유저의 비밀번호를 입력해 주세요:");
+        String password = scanner.nextLine();
+        System.out.println("등록할 유저의 역할을 입력해 주세요:");
+        String role = scanner.nextLine();
+
+        registerUser(email, username, password, role);
+    }
+
     public void updateUser(int userId, String username, String password, String role) { // email은 unique해야 해서 수정이 불가능하다
         String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";
         try {
@@ -76,6 +92,21 @@ public class ServiceProvider {
         }
     }
 
+    public void updateUserService(){
+        System.out.println("수정할 유저의 ID를 입력해 주세요:");
+        int userId = scanner.nextInt();
+        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+
+        System.out.println("새로운 이름을 입력해 주세요:");
+        String newName = scanner.nextLine();
+        System.out.println("새로운 역할을 입력해 주세요:");
+        String newRole = scanner.nextLine();
+        System.out.println("새로운 비밀번호를 입력해 주세요:");
+        String newPassword = scanner.nextLine();
+
+        updateUser(userId, newName, newPassword, newRole);
+    }
+
     public void deleteUser(int userId) {
         String sql = "DELETE FROM User WHERE user_id = ?";
         try {
@@ -86,5 +117,13 @@ public class ServiceProvider {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
         }
+    }
+
+    public void deleteUserService(){
+        System.out.println("삭제할 유저의 ID를 입력해 주세요:");
+        int userId = scanner.nextInt();
+        scanner.nextLine();
+
+        deleteUser(userId);
     }
 }

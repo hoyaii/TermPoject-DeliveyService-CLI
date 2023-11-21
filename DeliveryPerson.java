@@ -48,6 +48,21 @@ public class DeliveryPerson {
         }
     }
 
+    public void getDeliveryHistoryService(int deliveryPersonId){
+        ResultSet deliveryHistory = getDeliveryHistory(deliveryPersonId);
+        try {
+            while (deliveryHistory.next()) {
+                int orderId = deliveryHistory.getInt("order_id");
+                String restaurantName = deliveryHistory.getString("restaurant_name");
+                String customerName = deliveryHistory.getString("customer_name");
+                System.out.println("주문 ID: " + orderId + ", 음식점 이름: " + restaurantName + ", 고객 이름: " + customerName);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving delivery history.");
+            e.printStackTrace();
+        }
+    }
+
     public ResultSet getDeliveryList() {
         String sql = "SELECT * FROM Orders WHERE delivery_status = 'Waiting' OR delivery_status = 'In Progress'";
         try {

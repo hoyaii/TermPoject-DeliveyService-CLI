@@ -17,8 +17,10 @@ class Main {
         System.out.println("비밀번호를 입력하세요:");
         String password = scanner.nextLine();
 
-        Integer userId = serviceProvider.getUserIdByEmail(email);
         String role = serviceProvider.login(email, password);
+        Integer userId = serviceProvider.getUserIdByEmail(email);
+
+        // 기능 선택
         if (role == null) {
             System.out.println("사용자 이름 또는 비밀번호가 잘못되었습니다.");
 
@@ -29,10 +31,10 @@ class Main {
             handleRestaurantOwner(db, userId);
 
         } else if (role.equals("DeliveryPerson")) {
-            handleDeliveryPerson(db);
+            handleDeliveryPerson(db, userId);
 
         } else if (role.equals("ServiceProvider")){
-            handleServiceProvider();
+            handleServiceProvider(db);
         }
 
         db.close();
@@ -116,7 +118,7 @@ class Main {
         }
     }
 
-    public static void handleDeliveryPerson(Database db) {
+    public static void handleDeliveryPerson(Database db, Integer userId) {
         DeliveryPerson deliveryPerson = new DeliveryPerson(db);
 
         Scanner scanner = new Scanner(System.in);
@@ -137,14 +139,44 @@ class Main {
                 deliveryPerson.updateDeliveryStatusService();
                 break;
 
+            case 3:
+                deliveryPerson.getDeliveryHistoryService(userId);
+                break;
 
+            default:
+                System.out.println("잘못된 선택입니다.");
+                break;
         }
     }
 
-    public static void handleServiceProvider() {
+    public static void handleServiceProvider(Database db) {
+        ServiceProvider serviceProvider = new ServiceProvider(db);
+
         System.out.println("관리자님, 환영합니다! 아래 옵션 중 선택해 주세요:");
         System.out.println("1. 유저 계정 등록");
         System.out.println("2. 유저 계정 수정");
         System.out.println("3. 유저 계정 삭제");
+
+        Scanner scanner = new Scanner(System.in);
+        int option = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (option) {
+            case 1:
+                serviceProvider.registerUserService();
+                break;
+
+            case 2:
+                serviceProvider.updateUserService();
+                break;
+
+            case 3:
+                serviceProvider.deleteUserService();
+                break;
+
+            default:
+                System.out.println("잘못된 선택입니다.");
+                break;
+        }
     }
 }
