@@ -1,4 +1,5 @@
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -62,6 +63,19 @@ public class RestaurantOwner {
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
+        }
+    }
+
+    public ResultSet getOrderHistory(int restaurantId) {
+        String sql = "SELECT * FROM `Order` WHERE menu_id IN (SELECT menu_id FROM Menu WHERE restaurant_id = ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
         }
     }
 }
