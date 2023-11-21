@@ -119,10 +119,26 @@ class Main {
     public static void handleDeliveryPerson(Database db) {
         DeliveryPerson deliveryPerson = new DeliveryPerson(db);
 
+        Scanner scanner = new Scanner(System.in);
+        int option = scanner.nextInt();
+        scanner.nextLine();
+
         System.out.println("배달원님, 환영합니다! 아래 옵션 중 선택해 주세요:");
         System.out.println("1. 배달 리스트 확인");
         System.out.println("2. 배달 상태 업데이트");
         System.out.println("3. 배달 이력 확인");
+
+        switch (option) {
+            case 1:
+                deliveryPerson.getDeliveryListService();
+                break;
+
+            case 2:
+                deliveryPerson.updateDeliveryStatusService();
+                break;
+
+
+        }
     }
 
     public static void handleServiceProvider() {

@@ -1,12 +1,15 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class DeliveryPerson {
     private Database db;
+    private Scanner scanner;
 
     public DeliveryPerson(Database db) {
         this.db = db;
+        this.scanner = new Scanner(System.in);
     }
 
     public void updateDeliveryStatus(int orderId, String status) {
@@ -22,6 +25,16 @@ public class DeliveryPerson {
         }
     }
 
+    public void updateDeliveryStatusService(){
+        System.out.println("배달 상태를 업데이트할 주문 ID를 입력해 주세요:");
+        int orderId = scanner.nextInt();
+        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        System.out.println("새로운 배달 상태를 입력해 주세요:");
+        String newStatus = scanner.nextLine();
+
+        updateDeliveryStatus(orderId, newStatus);
+    }
+
     public ResultSet getDeliveryHistory(int deliveryPersonId) {
         String sql = "SELECT * FROM `Order` WHERE delivery_person_id = ?";
         try {
@@ -32,6 +45,34 @@ public class DeliveryPerson {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public ResultSet getDeliveryList() {
+        String sql = "SELECT * FROM Orders WHERE delivery_status = 'Waiting' OR delivery_status = 'In Progress'";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void getDeliveryListService(){
+        ResultSet deliveryList = getDeliveryList();
+        try {
+            while (deliveryList.next()) {
+                int orderId = deliveryList.getInt("order_id");
+                String restaurantName = deliveryList.getString("restaurant_name");
+                String customerName = deliveryList.getString("customer_name");
+                String deliveryStatus = deliveryList.getString("delivery_status");
+                System.out.println("주문 ID: " + orderId + ", 음식점 이름: " + restaurantName + ", 고객 이름: " + customerName + ", 배달 상태: " + deliveryStatus);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving delivery list.");
+            e.printStackTrace();
         }
     }
 }
