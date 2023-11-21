@@ -5,23 +5,44 @@ import java.util.Scanner;
 
 public class RestaurantOwner {
     private Database db;
-    private Scanner scanner;
+    private int ownerId;
 
-    public RestaurantOwner(Database db) {
+    public RestaurantOwner(Database db, int ownerId) {  // ownerId를 받는 생성자 추가
         this.db = db;
-        this.scanner = new Scanner(System.in);
+        this.ownerId = ownerId;  // ownerId 초기화
     }
-    public void registerRestaurant(String name, String address, String cuisineType) { // 음식점 등록
-        String sql = "INSERT INTO Restaurant (name, address, cuisine_type) VALUES (?, ?, ?)";
+
+    public boolean registerRestaurant(String name, String address, String cuisineType) {
+        String sql = "INSERT INTO Restaurant (name, address, cuisine_type) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, address);
             preparedStatement.setString(3, cuisineType);
-            preparedStatement.executeUpdate();
+            preparedStatement.setInt(4, this.ownerId);
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updateRestaurantInfo(String name, String address, String cuisineType) {
+        String sql = "UPDATE Restaurant SET name = ?, address = ?, cuisine_type = ? WHERE owner_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, address);
+            preparedStatement.setString(3, cuisineType);
+            preparedStatement.setInt(4, this.ownerId);
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return false;
         }
     }
 

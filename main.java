@@ -11,13 +11,14 @@ class Main {
 
         // 로그인 진행
         System.out.println("서비스에 오신 것을 환영합니다! 로그인해 주세요.");
-        System.out.println("사용자 이름을 입력하세요:");
-        String username = scanner.nextLine();
+        System.out.println("이메일을 입력하세요:");
+        String email = scanner.nextLine();
 
         System.out.println("비밀번호를 입력하세요:");
         String password = scanner.nextLine();
 
-        String role = serviceProvider.login(username, password);
+        Integer userId = serviceProvider.getUserIdByEmail(email);
+        String role = serviceProvider.login(email, password);
         if (role == null) {
             System.out.println("사용자 이름 또는 비밀번호가 잘못되었습니다.");
 
@@ -25,7 +26,7 @@ class Main {
             handleCustomer(db);
 
         } else if (role.equals("RestaurantOwner")) {
-            handleRestaurantOwner(db);
+            handleRestaurantOwner(db, userId);
 
         } else if (role.equals("DeliveryPerson")) {
             handleDeliveryPerson(db);
@@ -120,14 +121,54 @@ class Main {
         }
     }
 
-    public static void handleRestaurantOwner(Database db) {
-        RestaurantOwner restaurantOwner = new RestaurantOwner(db);
+    public static void handleRestaurantOwner(Database db, Integer userId) {
+        RestaurantOwner restaurantOwner = new RestaurantOwner(db, userId);
 
         System.out.println("사장님, 환영합니다! 아래 옵션 중 선택해 주세요:");
-        System.out.println("1. 음식점 정보 등록 및 업데이트");
-        System.out.println("2. 메뉴 관리");
-        System.out.println("3. 주문 처리");
-        System.out.println("4. 주문 이력 조회");
+        System.out.println("1. 음식점 정보 등록");
+        System.out.println("2. 음식점 정보 업데이트");
+        System.out.println("3. 메뉴 관리");
+        System.out.println("4. 주문 처리");
+        System.out.println("5. 주문 이력 조회");
+
+        Scanner scanner = new Scanner(System.in);
+        int option = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (option) {
+            case 1:
+                System.out.println("등록할 음식점의 이름을 입력해 주세요:");
+                String registerName = scanner.nextLine();
+                System.out.println("등록할 음식점의 위치를 입력해 주세요:");
+                String registerLocation = scanner.nextLine();
+                System.out.println("등록할 음식점의 음식 종류를 입력해 주세요:");
+                String registerType = scanner.nextLine();
+
+                boolean registerSuccess = restaurantOwner.registerRestaurant(registerName, registerLocation, registerType);
+                if (registerSuccess) {
+                    System.out.println("음식점 정보가 성공적으로 등록되었습니다.");
+                } else {
+                    System.out.println("음식점 정보 등록에 실패하였습니다.");
+                }
+                break;
+
+            case 2:
+                System.out.println("업데이트할 음식점의 이름을 입력해 주세요:");
+                String updateName = scanner.nextLine();
+                System.out.println("업데이트할 음식점의 위치를 입력해 주세요:");
+                String updateLocation = scanner.nextLine();
+                System.out.println("업데이트할 음식점의 음식 종류를 입력해 주세요:");
+                String updateType = scanner.nextLine();
+
+                boolean updateSuccess = restaurantOwner.updateRestaurantInfo(updateName, updateLocation, updateType);
+                if (updateSuccess) {
+                    System.out.println("음식점 정보가 성공적으로 업데이트되었습니다.");
+                } else {
+                    System.out.println("음식점 정보 업데이트에 실패하였습니다.");
+                }
+                break;
+            // ...
+        }
     }
 
     public static void handleDeliveryPerson(Database db) {
