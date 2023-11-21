@@ -1,4 +1,5 @@
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class DeliveryPerson {
@@ -18,6 +19,19 @@ public class DeliveryPerson {
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
+        }
+    }
+
+    public ResultSet getDeliveryHistory(int deliveryPersonId) {
+        String sql = "SELECT * FROM `Order` WHERE delivery_person_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, deliveryPersonId);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
         }
     }
 }
