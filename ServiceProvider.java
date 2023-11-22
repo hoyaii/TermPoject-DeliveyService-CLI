@@ -41,9 +41,17 @@ public class ServiceProvider {
     public String loginService(){
         System.out.println("이메일을 입력하세요:");
         String email = scanner.nextLine();
+        if (email == null || email.isEmpty() || !isValidEmail(email)) {
+            System.out.println("유효한 이메일을 입력해주세요.");
+            return null;
+        }
 
         System.out.println("비밀번호를 입력하세요:");
         String password = scanner.nextLine();
+        if (password == null || password.isEmpty() || !isValidPassword(password)) {
+            System.out.println("유효한 비밀번호를 입력해주세요.");
+            return null;
+        }
 
         if(login(email, password)){
             return email;
@@ -96,8 +104,6 @@ public class ServiceProvider {
 
         registerUser(email, username, password, role);
     }
-
-
 
     public void updateUser(int userId, String username, String password, String role) { // email은 unique해야 해서 수정이 불가능하다
         String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";
