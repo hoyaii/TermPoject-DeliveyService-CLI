@@ -19,8 +19,8 @@ public class ServiceProvider {
         this.scanner = new Scanner(System.in);
     }
 
-    public Boolean login(String email, String password) {
-        String sql = "SELECT role FROM User WHERE email = ? AND password = ?";
+    public boolean login(String email, String password) {
+        String sql = "SELECT id FROM User WHERE email = ? AND password = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);
@@ -29,12 +29,12 @@ public class ServiceProvider {
             if (resultSet.next()) {
                 return true;
             } else {
-                return null;
+                return false;
             }
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
-            return null;
+            return false;
         }
     }
 
@@ -83,11 +83,14 @@ public class ServiceProvider {
 
     public void registerUserService(){
         String email = null;
-        while (email == null || email.isEmpty() || !isValidEmail(email)) {
+        while (email == null || email.isEmpty() || !isValidEmail(email) || getUserIdByEmail(email) != null) {
             System.out.println("등록할 유저의 이메일을 입력해 주세요:");
             email = scanner.nextLine();
             if (email == null || email.isEmpty() || !isValidEmail(email)) {
                 System.out.println("올바른 이메일 형식을 입력해주세요.");
+            } else if (getUserIdByEmail(email) != null) { // 이메일 중복 확인
+                System.out.println("이미 사용 중인 이메일입니다. 다른 이메일을 입력해주세요.");
+                email = null; // 이메일 초기화
             }
         }
 
@@ -173,13 +176,13 @@ public class ServiceProvider {
     }
 
     public Integer getUserIdByEmail(String email) { // userId 구하기
-        String sql = "SELECT user_id FROM User WHERE email = ?";
+        String sql = "SELECT id FROM User WHERE email = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getInt("user_id");
+                return resultSet.getInt("id");
             } else {
                 return null;
             }
