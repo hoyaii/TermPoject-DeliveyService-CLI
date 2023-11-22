@@ -1,5 +1,6 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.Scanner;
 
 class Main {
@@ -9,32 +10,42 @@ class Main {
 
         ServiceProvider serviceProvider = new ServiceProvider(db);
 
-        // 로그인 진행
-        System.out.println("서비스에 오신 것을 환영합니다! 로그인해 주세요.");
-        System.out.println("이메일을 입력하세요:");
-        String email = scanner.nextLine();
+        while (true) {
+            System.out.println("서비스에 오신 것을 환영합니다! 아래 옵션 중 선택해 주세요:");
+            System.out.println("1. 로그인");
+            System.out.println("2. 회원 가입");
 
-        System.out.println("비밀번호를 입력하세요:");
-        String password = scanner.nextLine();
+            int option = scanner.nextInt();
+            scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
 
-        String role = serviceProvider.login(email, password);
-        Integer userId = serviceProvider.getUserIdByEmail(email);
+            if (option == 1) {
+                // 로그인 진행
+                String email = serviceProvider.loginService();
 
-        // 기능 선택
-        if (role == null) {
-            System.out.println("사용자 이름 또는 비밀번호가 잘못되었습니다.");
+                Integer userId = serviceProvider.getUserIdByEmail(email);
+                String role = serviceProvider.getRoleByEmail(email);
 
-        } else if (role.equals("Customer")) {
-            handleCustomer(db);
-
-        } else if (role.equals("RestaurantOwner")) {
-            handleRestaurantOwner(db, userId);
-
-        } else if (role.equals("DeliveryPerson")) {
-            handleDeliveryPerson(db, userId);
-
-        } else if (role.equals("ServiceProvider")){
-            handleServiceProvider(db);
+                // 기능 선택
+                if (role == null) {
+                    System.out.println("사용자 이름 또는 비밀번호가 잘못되었습니다. 다시 시도해 주세요.");
+                    continue;
+                } else if (role.equals("Customer")) {
+                    handleCustomer(db);
+                    break;
+                } else if (role.equals("RestaurantOwner")) {
+                    handleRestaurantOwner(db, userId);
+                    break;
+                } else if (role.equals("DeliveryPerson")) {
+                    handleDeliveryPerson(db, userId);
+                    break;
+                } else if (role.equals("ServiceProvider")){
+                    handleServiceProvider(db);
+                    break;
+                }
+            } else if (option == 2) {
+                // 회원 가입 진행
+                serviceProvider.registerUserService();
+            }
         }
 
         db.close();

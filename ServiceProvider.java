@@ -12,7 +12,7 @@ public class ServiceProvider {
         this.scanner = new Scanner(System.in);
     }
 
-    public String login(String email, String password) {
+    public Boolean login(String email, String password) {
         String sql = "SELECT role FROM User WHERE email = ? AND password = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
@@ -20,13 +20,28 @@ public class ServiceProvider {
             preparedStatement.setString(2, password);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getString("role");
+                return true;
             } else {
                 return null;
             }
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String loginService(){
+        System.out.println("이메일을 입력하세요:");
+        String email = scanner.nextLine();
+
+        System.out.println("비밀번호를 입력하세요:");
+        String password = scanner.nextLine();
+
+        if(login(email, password)){
+            return email;
+        }
+        else{
             return null;
         }
     }
@@ -39,6 +54,24 @@ public class ServiceProvider {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("user_id");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getRoleByEmail(String email) {
+        String sql = "SELECT role FROM User WHERE email = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, email);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("role");
             } else {
                 return null;
             }
