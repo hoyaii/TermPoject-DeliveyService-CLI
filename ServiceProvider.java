@@ -39,25 +39,30 @@ public class ServiceProvider {
     }
 
     public String loginService(){
-        System.out.println("이메일을 입력하세요:");
-        String email = scanner.nextLine();
-        if (email == null || email.isEmpty() || !isValidEmail(email)) {
-            System.out.println("유효한 이메일을 입력해주세요.");
-            return null;
+        String email = null;
+        while (email == null || email.isEmpty() || !isValidEmail(email)) {
+            System.out.println("이메일을 입력하세요:");
+            email = scanner.nextLine();
+            if (email == null || email.isEmpty() || !isValidEmail(email)) {
+                System.out.println("유효한 이메일을 입력해주세요.");
+            }
         }
 
-        System.out.println("비밀번호를 입력하세요:");
-        String password = scanner.nextLine();
-        if (password == null || password.isEmpty() || !isValidPassword(password)) {
-            System.out.println("유효한 비밀번호를 입력해주세요.");
-            return null;
+        String password = null;
+        while (password == null || password.isEmpty() || !isValidPassword(password)) {
+            System.out.println("비밀번호를 입력하세요:");
+            password = scanner.nextLine();
+            if (password == null || password.isEmpty() || !isValidPassword(password)) {
+                System.out.println("유효한 비밀번호를 입력해주세요.");
+            }
         }
 
         if(login(email, password)){
             return email;
         }
         else{
-            return null;
+            System.out.println("이메일 또는 비밀번호가 잘못되었습니다. 다시 시도해주세요.");
+            return loginService();
         }
     }
 
@@ -77,33 +82,45 @@ public class ServiceProvider {
     }
 
     public void registerUserService(){
-        System.out.println("등록할 유저의 이메일을 입력해 주세요:");
-        String email = scanner.nextLine();
-        if (email == null || email.isEmpty() || !isValidEmail(email)) {
-            System.out.println("올바른 이메일 형식을 입력해주세요.");
-            return;
+        String email = null;
+        while (email == null || email.isEmpty() || !isValidEmail(email)) {
+            System.out.println("등록할 유저의 이메일을 입력해 주세요:");
+            email = scanner.nextLine();
+            if (email == null || email.isEmpty() || !isValidEmail(email)) {
+                System.out.println("올바른 이메일 형식을 입력해주세요.");
+            }
         }
-        System.out.println("등록할 유저의 이름을 입력해 주세요:");
-        String username = scanner.nextLine();
-        if (username == null || username.isEmpty()) {
-            System.out.println("이름을 입력해주세요.");
-            return;
+
+        String username = null;
+        while (username == null || username.isEmpty()) {
+            System.out.println("등록할 유저의 이름을 입력해 주세요:");
+            username = scanner.nextLine();
+            if (username == null || username.isEmpty()) {
+                System.out.println("이름을 입력해주세요.");
+            }
         }
-        System.out.println("등록할 유저의 비밀번호를 입력해 주세요:");
-        String password = scanner.nextLine();
-        if (password == null || password.isEmpty() || !isValidPassword(password)) {
-            System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
-            return;
+
+        String password = null;
+        while (password == null || password.isEmpty() || !isValidPassword(password)) {
+            System.out.println("등록할 유저의 비밀번호를 입력해 주세요:");
+            password = scanner.nextLine();
+            if (password == null || password.isEmpty() || !isValidPassword(password)) {
+                System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
+            }
         }
-        System.out.println("등록할 유저의 역할을 입력해 주세요:");
-        String role = scanner.nextLine();
-        if (role == null || role.isEmpty()) {
-            System.out.println("역할을 입력해주세요.");
-            return;
+
+        String role = null;
+        while (role == null || role.isEmpty() || (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider"))) {
+            System.out.println("등록할 유저의 역할을 입력해 주세요:");
+            role = scanner.nextLine();
+            if (role == null || role.isEmpty() || (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider"))) {
+                System.out.println("역할은 'Customer', 'RestaurantOwner', 'DeliveryPerson', 'ServiceProvider' 중 하나여야 합니다.");
+            }
         }
 
         registerUser(email, username, password, role);
     }
+
 
     public void updateUser(int userId, String username, String password, String role) { // email은 unique해야 해서 수정이 불가능하다
         String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";

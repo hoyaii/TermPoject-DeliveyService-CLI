@@ -26,10 +26,7 @@ class Main {
                 String role = serviceProvider.getRoleByEmail(email);
 
                 // 기능 선택
-                if (role == null) {
-                    System.out.println("사용자 이름 또는 비밀번호가 잘못되었습니다. 다시 시도해 주세요.");
-                    continue;
-                } else if (role.equals("Customer")) {
+                if (role.equals("Customer")) {
                     handleCustomer(db);
                     break;
                 } else if (role.equals("RestaurantOwner")) {
