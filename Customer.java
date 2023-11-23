@@ -130,10 +130,29 @@ public class Customer {
         }
     }
 
-    public void getDeliveryStatusService(){
-        System.out.println("배달 상태를 확인하고 싶은 주문의 ID를 입력해 주세요:");
+    public void getDeliveryStatusService(int userId){
+        System.out.println("주문 목록을 보고 확인하고 싶은 주문의 id를 입력해주새요");
+
+        List<Integer> userOrders = getUserOrders(userId);
+
+        if (userOrders.isEmpty()) {
+            System.out.println("주문이 없습니다.");
+            return;
+        }
+
+        for (Integer orderId : userOrders) {
+            System.out.println("주문 ID: " + orderId);
+        }
+
+        System.out.println("배달 상태를 확인하고 싶은 주문의 ID를 입력해주세요:");
         int orderId = scanner.nextInt();
         scanner.nextLine();
+
+        if (!userOrders.contains(orderId)) {
+            System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            return;
+        }
+
 
         String deliveryStatus = getDeliveryStatus(orderId);
         if (deliveryStatus != null) {
@@ -191,5 +210,24 @@ public class Customer {
         }
 
         return orderIds;
+    }
+
+    public String getMenuNameFromOrder(int orderId) {
+        String sql = "SELECT m.name FROM Orders o JOIN Menu m ON o.menu_id = m.menu_id WHERE o.order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("name");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -49,7 +49,7 @@ class Main {
         scanner.close();
     }
 
-    public static void handleCustomer(Database db, Integer userId) {
+    public static void handleCustomer(Database db, int userId) {
         Customer customer = new Customer(db, userId);
 
         System.out.println("고객님, 환영합니다! 아래 옵션 중 선택해 주세요:");
@@ -72,7 +72,7 @@ class Main {
                 break;
 
             case 3:
-                customer.getDeliveryStatusService();
+                customer.getDeliveryStatusService(userId);
                 break;
 
             case 4:
