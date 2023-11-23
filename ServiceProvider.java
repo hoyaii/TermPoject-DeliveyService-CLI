@@ -20,7 +20,7 @@ public class ServiceProvider {
     }
 
     public boolean login(String email, String password) {
-        String sql = "SELECT id FROM User WHERE email = ? AND password = ?";
+        String sql = "SELECT user_id FROM User WHERE email = ? AND password = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);
@@ -176,7 +176,7 @@ public class ServiceProvider {
     }
 
     public Integer getUserIdByEmail(String email) { // userId 구하기
-        String sql = "SELECT id FROM User WHERE email = ?";
+        String sql = "SELECT user_id FROM User WHERE email = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);

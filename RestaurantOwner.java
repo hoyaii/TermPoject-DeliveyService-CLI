@@ -14,25 +14,6 @@ public class RestaurantOwner {
         this.scanner = new Scanner(System.in);
     }
 
-    public Integer getRestaurantIdByName(String name) {
-        String sql = "SELECT restaurant_id FROM Restaurant WHERE name = ? AND owner_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setInt(2, this.ownerId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("restaurant_id");
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public boolean registerRestaurant(String name, String address, String cuisineType) {
         String sql = "INSERT INTO Restaurant (name, address, cuisine_type, owner_id) VALUES (?, ?, ?, ?)";
         try {
@@ -196,7 +177,7 @@ public class RestaurantOwner {
     }
 
     public void processOrder(int orderId, String status) {
-        String sql = "UPDATE `Order` SET order_status = ? WHERE order_id = ?";
+        String sql = "UPDATE Orders SET order_status = ? WHERE order_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, status);
@@ -225,7 +206,7 @@ public class RestaurantOwner {
     }
 
     public ResultSet getOrderHistory(int restaurantId) {
-        String sql = "SELECT * FROM `Order` WHERE menu_id IN (SELECT menu_id FROM Menu WHERE restaurant_id = ?)";
+        String sql = "SELECT * FROM Orders WHERE menu_id IN (SELECT menu_id FROM Menu WHERE restaurant_id = ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, restaurantId);
@@ -255,6 +236,25 @@ public class RestaurantOwner {
             }
         } else {
             System.out.println("해당 이름의 식당이 없습니다.");
+        }
+    }
+
+    public Integer getRestaurantIdByName(String name) {
+        String sql = "SELECT restaurant_id FROM Restaurant WHERE name = ? AND owner_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setInt(2, this.ownerId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("restaurant_id");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
         }
     }
 }

@@ -81,7 +81,7 @@ public class Customer {
     public void menuService(){
         System.out.println("주문하실 음식점의 ID를 입력해 주세요:");
         int restaurantId = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
 
         ResultSet menuResultSet = getMenu(restaurantId);
         try {
@@ -98,7 +98,7 @@ public class Customer {
 
         System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
         int menuId = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
 
         boolean orderSuccess = orderMenu(restaurantId, menuId);
         if (orderSuccess) {

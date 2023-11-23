@@ -17,28 +17,6 @@ public class Database {
         }
     }
 
-    public ResultSet executeQuery(String sql) {
-        try {
-            Statement statement = this.connection.createStatement();
-            return statement.executeQuery(sql);
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public int executeUpdate(String sql) {
-        try {
-            Statement statement = this.connection.createStatement();
-            return statement.executeUpdate(sql);
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL update.");
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
     public void close() {
         try {
             this.connection.close();
