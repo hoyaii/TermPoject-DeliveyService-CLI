@@ -173,7 +173,7 @@ public class Customer {
             preparedStatement.setInt(1, orderId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getString("delivery_status");
+                return resultSet.getString("order_status");
             } else {
                 return null;
             }

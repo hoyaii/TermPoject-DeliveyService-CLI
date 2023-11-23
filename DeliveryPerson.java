@@ -37,10 +37,6 @@ public class DeliveryPerson {
         updateDeliveryStatus(orderId, newStatus);
     }
 
-    // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
-    // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
-    // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
-
     public ResultSet getDeliveryRequest(int userId){
         String sql = "SELECT * FROM Delivery WHERE delivery_person_id = ?";
         try{
@@ -51,6 +47,66 @@ public class DeliveryPerson {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public String getRestaurantAddress(int restaurantId) {
+        String sql = "SELECT address FROM Restaurant  WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("address");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void getDeliveryRequestService(int userId){ //  배달원이 요청 리스트를 보고 승낙하여 매칭
+        System.out.println("요청이 들어온 배달 목록들입니다. 수락하고 싶은 배달을 선택해 주세요");
+        ResultSet resultSet = getDeliveryRequest(userId);
+
+        try {
+            if(resultSet.wasNull()){
+                System.out.println("요청이 들어온 배달 요청이 없습니다.");
+                return;
+            }
+
+            while (resultSet.next()) {
+                int deliveryId = resultSet.getInt("delivery_id ");
+                int restaurantId = resultSet.getInt("restaurant_id");
+                String deliveryAddress = resultSet.getString("delivery_address");
+                String restaurantAddress = getRestaurantAddress(restaurantId);
+                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving delivery history.");
+            e.printStackTrace();
+        }
+
+        System.out.println("수락하고 싶은 요청의 id를 입력하세요.");
+        int deliveryId = scanner.nextInt();
+        scanner.nextLine();
+        acceptDelivery(deliveryId);
+    }
+
+    public void acceptDelivery(int deliveryId) {
+        String sql = "UPDATE Delivery SET status = ? WHERE delivery_id = ?";
+        String status = "accepted";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, status);
+            preparedStatement.setInt(2, deliveryId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
         }
     }
 
