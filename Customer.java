@@ -122,6 +122,11 @@ public class Customer {
         } else {
             System.out.println("주문에 실패하였습니다.");
         }
+
+        // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
+        // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
+        // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
+
     }
 
     public String getDeliveryStatus(int orderId) {
@@ -262,5 +267,22 @@ public class Customer {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Integer> getAvailableDeliveryPeople(String serviceArea) {
+        List<Integer> availableDeliveryPeople = new ArrayList<>();
+        String sql = "SELECT delivery_person_id FROM DeliveryPerson WHERE service_area = ? AND status = 'Free'";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, serviceArea);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                availableDeliveryPeople.add(resultSet.getInt("delivery_person_id"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+        return availableDeliveryPeople;
     }
 }
