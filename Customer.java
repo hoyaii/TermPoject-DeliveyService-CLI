@@ -3,10 +3,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Customer {
     private Database db;
@@ -34,7 +31,7 @@ public class Customer {
         }
     }
 
-    public void searchRestaurantsService(){
+    public void searchRestaurantsService(int userId){
         System.out.println("검색하실 음식점의 이름을 입력해 주세요:");
         String name = scanner.nextLine();
         System.out.println("검색하실 음식점의 위치를 입력해 주세요:");
@@ -68,6 +65,23 @@ public class Customer {
         } else {
             System.out.println("유효하지 않은 음식점 ID입니다.");
         }
+    }
+
+    public void requestDeliveryService(int restaurantId){ // restarauntId,
+        String serviceArea = getServiceArea(restaurantId);
+
+        List<Integer> availableDeliveryPersons =  getAvailableDeliveryPeople(serviceArea);
+
+        Random rand = new Random();
+
+        int randomIndex = rand.nextInt(availableDeliveryPersons.size());
+        Integer selectedPerson = availableDeliveryPersons.get(randomIndex);
+
+
+
+        // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
+        // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
+        // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
     }
 
     public ResultSet getMenu(int restaurantId) {
@@ -199,7 +213,7 @@ public class Customer {
         }
     }
 
-    public void writeReviewService(){
+    public void writeReviewService(int userId){
         System.out.println("리뷰를 작성할 음식점의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
         System.out.println("리뷰의 별점을 입력해 주세요:");
@@ -212,7 +226,7 @@ public class Customer {
     }
 
     public List<Integer> getUserOrders(int userId) {
-        String sql = "SELECT order_id FROM Orders WHERE customer_id = ?";
+        String sql = "SELECT order_id FROM Orders WHERE user_id = ?";
         List<Integer> orderIds = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
@@ -270,19 +284,41 @@ public class Customer {
     }
 
     public List<Integer> getAvailableDeliveryPeople(String serviceArea) {
-        List<Integer> availableDeliveryPeople = new ArrayList<>();
+        List<Integer> availableDeliveryPersons = new ArrayList<>();
         String sql = "SELECT delivery_person_id FROM DeliveryPerson WHERE service_area = ? AND status = 'Free'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, serviceArea);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                availableDeliveryPeople.add(resultSet.getInt("delivery_person_id"));
+                availableDeliveryPersons.add(resultSet.getInt("delivery_person_id"));
             }
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
         }
-        return availableDeliveryPeople;
+        return availableDeliveryPersons;
     }
+
+    public String getServiceArea(int restaurantId){
+        String sql = "SELECT service_area FROM Restaurant WHERE restaurant_id = ?";
+
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("restaurant_id");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
 }

@@ -65,7 +65,7 @@ public class DeliveryPerson {
         }
     }
 
-    public ResultSet getDeliveryList() {
+    public ResultSet getDeliveryList() { // 엉터리 쿼리
         String sql = "SELECT * FROM Orders WHERE delivery_status = 'Waiting' OR delivery_status = 'In Progress'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
@@ -77,7 +77,7 @@ public class DeliveryPerson {
         }
     }
 
-    public void getDeliveryListService(){
+    public void getDeliveryListService(){ // 엉터리 쿼리
         ResultSet deliveryList = getDeliveryList();
         try {
             while (deliveryList.next()) {

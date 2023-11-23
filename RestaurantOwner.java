@@ -1,17 +1,19 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class RestaurantOwner {
     private Database db;
     private Scanner scanner;
-    private int ownerId;
+    private int userId; // 사장님 id
 
-    public RestaurantOwner(Database db, int ownerId) {
+    public RestaurantOwner(Database db, int userId) {
         this.db = db;
         this.scanner = new Scanner(System.in);
-        this.ownerId = ownerId;  // ownerId 초기화
+        this.userId = userId;  // ownerId 초기화
     }
 
     public boolean registerRestaurant(String name, String address, String cuisineType) {
@@ -21,7 +23,7 @@ public class RestaurantOwner {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, address);
             preparedStatement.setString(3, cuisineType);
-            preparedStatement.setInt(4, this.ownerId);
+            preparedStatement.setInt(4, this.userId);
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
@@ -244,7 +246,7 @@ public class RestaurantOwner {
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
-            preparedStatement.setInt(2, this.ownerId);
+            preparedStatement.setInt(2, this.userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("restaurant_id");

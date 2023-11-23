@@ -54,7 +54,7 @@ class Main {
 
         System.out.println("고객님, 환영합니다! 아래 옵션 중 선택해 주세요:");
         System.out.println("1. 음식점 검색");
-        System.out.println("2. 메뉴 선택 및 주문");
+        //System.out.println("2. 메뉴 선택 및 주문");
         System.out.println("3. 배달 상태 확인");
         System.out.println("4. 리뷰 작성");
 
@@ -64,7 +64,7 @@ class Main {
 
         switch (option) {
             case 1:
-                customer.searchRestaurantsService();
+                customer.searchRestaurantsService(userId);
                 break;
 
             case 2:
@@ -76,7 +76,7 @@ class Main {
                 break;
 
             case 4:
-                customer.writeReviewService();
+                customer.writeReviewService(userId);
                 break;
 
             default:

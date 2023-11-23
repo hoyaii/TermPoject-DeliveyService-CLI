@@ -66,52 +66,16 @@ public class ServiceProvider {
         }
     }
 
-    public void registerUser(String email, String username, String password, String role) {
-        String sql = "INSERT INTO User (email, username, password, role) VALUES (?, ?, ?, ?)";
+    public void registerUser(String email, String username, String password, String role, String phoneNumber, String address) {
+        String sql = "INSERT INTO User (email, username, password, role, phoneNumber, address) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);
             preparedStatement.setString(2, username);
             preparedStatement.setString(3, password);
             preparedStatement.setString(4, role);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-        }
-    }
-
-    public void registerCustomer(int userId, String address) {
-        String sql = "INSERT INTO Customer (user_id, address) VALUES (?, ?)";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setString(2, address);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-        }
-    }
-
-    public void registerDeliveryPerson(int userId, String serviceArea) {
-        String sql = "INSERT INTO DeliveryPerson (user_id, service_area) VALUES (?, ?)";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setString(2, serviceArea);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-        }
-    }
-
-    public void registerRestaurantOwner(int userId) {
-        String sql = "INSERT INTO RestaurantOwner (user_id) VALUES (?)";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(5, phoneNumber);
+            preparedStatement.setString(6, address);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
@@ -162,29 +126,24 @@ public class ServiceProvider {
             phoneNumber = scanner.nextLine();
         }
 
-        registerUser(email, username, password, role);
+        String address = null;
+        while(address == null || address.isEmpty()){
+            System.out.println("주소를 입력해 주세요:");
+            address = scanner.nextLine();
+        }
 
-        // 역할에 따라 추가 정보 입력
+        registerUser(email, username, password, role, phoneNumber, address);
+
+        // 배달원의 경우 추가 정보 입력
         int userId = getUserIdByEmail(email);
 
-        if (role.equals("Customer")) {
-            System.out.println("이어서 다음 정보를 입력해주세요.");
-
-            System.out.println("배달을 수령할 주소를 입력해 주세요:");
-            String address = scanner.nextLine();
-
-            registerCustomer(userId, address);
-
-        } else if (role.equals("RestaurantOwner")) { // RestaurantOwner는 추가 테이블에 등록하는 작업만 한다.
-            registerRestaurantOwner(userId);
-
-        } else if (role.equals("DeliveryPerson")) {
+        if (role.equals("DeliveryPerson")) {
             System.out.println("이어서 다음 정보를 입력해주세요.");
 
             System.out.println("배달 지역을 입력해 주세요:");
             String serviceArea = scanner.nextLine();
 
-            registerDeliveryPerson(userId, serviceArea);
+            addServiceArea(userId, serviceArea);
         }
     }
 
@@ -271,6 +230,19 @@ public class ServiceProvider {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public void addServiceArea(int userId, String serviceArea) {
+        String sql = "UPDATE User SET service_area = ? WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, serviceArea);
+            preparedStatement.setInt(2, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
         }
     }
 
