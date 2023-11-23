@@ -1,7 +1,10 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 
@@ -40,8 +43,11 @@ public class Customer {
         String type = scanner.nextLine();
 
         ResultSet resultSet = searchRestaurants(name, location, type);
+        HashSet<Integer> validRestaurantIds = new HashSet<>();
         try {
             while (resultSet.next()) {
+                int restaurantId = resultSet.getInt("restaurant_id");
+                validRestaurantIds.add(restaurantId);
                 System.out.println("음식점 ID: " + resultSet.getInt("restaurant_id"));
                 System.out.println("이름: " + resultSet.getString("name"));
                 System.out.println("위치: " + resultSet.getString("location"));
@@ -51,6 +57,16 @@ public class Customer {
         } catch (SQLException e) {
             System.out.println("ResultSet에서 읽는 중 에러가 발생했습니다.");
             e.printStackTrace();
+        }
+
+        System.out.println("메뉴를 확인하고 싶은 음식점의 ID를 입력해주세요.");
+        int restaurantId = scanner.nextInt();
+        scanner.nextLine();
+
+        if (validRestaurantIds.contains(restaurantId)) {
+            menuService(restaurantId);
+        } else {
+            System.out.println("유효하지 않은 음식점 ID입니다.");
         }
     }
 
@@ -82,11 +98,7 @@ public class Customer {
         }
     }
 
-    public void menuService(){
-        System.out.println("주문하실 음식점의 ID를 입력해 주세요:");
-        int restaurantId = scanner.nextInt();
-        scanner.nextLine();
-
+    public void menuService(int restaurantId){
         ResultSet menuResultSet = getMenu(restaurantId);
         try {
             while (menuResultSet.next()) {
@@ -113,7 +125,7 @@ public class Customer {
     }
 
     public String getDeliveryStatus(int orderId) {
-        String sql = "SELECT delivery_status FROM Orders WHERE order_id = ?";
+        String sql = "SELECT order_status FROM Orders WHERE order_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, orderId);
@@ -131,8 +143,6 @@ public class Customer {
     }
 
     public void getDeliveryStatusService(int userId){
-        System.out.println("주문 목록을 보고 확인하고 싶은 주문의 id를 입력해주새요");
-
         List<Integer> userOrders = getUserOrders(userId);
 
         if (userOrders.isEmpty()) {
@@ -141,10 +151,10 @@ public class Customer {
         }
 
         for (Integer orderId : userOrders) {
-            System.out.println("주문 ID: " + orderId);
+            System.out.println("메뉴명: " + getMenuNameFromOrder(orderId) + ", 주문 ID: " + orderId);
         }
 
-        System.out.println("배달 상태를 확인하고 싶은 주문의 ID를 입력해주세요:");
+        System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
         int orderId = scanner.nextInt();
         scanner.nextLine();
 
@@ -153,10 +163,12 @@ public class Customer {
             return;
         }
 
-
         String deliveryStatus = getDeliveryStatus(orderId);
+        String orderTime = getOrderTime(orderId);
         if (deliveryStatus != null) {
             System.out.println("배달 상태: " + deliveryStatus);
+            System.out.println("주문 시간: " + orderTime);
+
         } else {
             System.out.println("주문 ID가 잘못되었거나, 배달 상태를 확인할 수 없습니다.");
         }
@@ -221,6 +233,27 @@ public class Customer {
 
             if (resultSet.next()) {
                 return resultSet.getString("name");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getOrderTime(int orderId) {
+        String sql = "SELECT order_time FROM Orders WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                Timestamp timestamp = resultSet.getTimestamp("order_time");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                return sdf.format(timestamp);
             } else {
                 return null;
             }

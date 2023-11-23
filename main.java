@@ -68,7 +68,7 @@ class Main {
                 break;
 
             case 2:
-                customer.menuService();
+                // customer.menuService();
                 break;
 
             case 3:
