@@ -175,7 +175,7 @@ public class ServiceProvider {
 
             registerCustomer(userId, address);
 
-        } else if (role.equals("RestaurantOwner")) {
+        } else if (role.equals("RestaurantOwner")) { // RestaurantOwner는 추가 테이블에 등록하는 작업만 한다.
             registerRestaurantOwner(userId);
 
         } else if (role.equals("DeliveryPerson")) {
@@ -206,7 +206,7 @@ public class ServiceProvider {
     public void updateUserService(){
         System.out.println("수정할 유저의 ID를 입력해 주세요:");
         int userId = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
 
         System.out.println("새로운 이름을 입력해 주세요:");
         String newName = scanner.nextLine();

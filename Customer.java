@@ -1,6 +1,8 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Customer {
@@ -131,7 +133,7 @@ public class Customer {
     public void getDeliveryStatusService(){
         System.out.println("배달 상태를 확인하고 싶은 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
 
         String deliveryStatus = getDeliveryStatus(orderId);
         if (deliveryStatus != null) {
@@ -171,5 +173,23 @@ public class Customer {
         String reviewContent = scanner.nextLine();
 
         writeReview(restaurantName, rating, reviewContent);
+    }
+
+    public List<Integer> getUserOrders(int userId) {
+        String sql = "SELECT order_id FROM Orders WHERE customer_id = ?";
+        List<Integer> orderIds = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next()) {
+                orderIds.add(resultSet.getInt("order_id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return orderIds;
     }
 }
