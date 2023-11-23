@@ -5,13 +5,13 @@ import java.util.Scanner;
 
 public class RestaurantOwner {
     private Database db;
-    private int ownerId;
     private Scanner scanner;
+    private int ownerId;
 
-    public RestaurantOwner(Database db, int ownerId) {  // ownerId를 받는 생성자 추가
+    public RestaurantOwner(Database db, int ownerId) {
         this.db = db;
-        this.ownerId = ownerId;  // ownerId 초기화
         this.scanner = new Scanner(System.in);
+        this.ownerId = ownerId;  // ownerId 초기화
     }
 
     public boolean registerRestaurant(String name, String address, String cuisineType) {

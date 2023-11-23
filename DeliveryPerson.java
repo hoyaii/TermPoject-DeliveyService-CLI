@@ -6,10 +6,12 @@ import java.util.Scanner;
 public class DeliveryPerson {
     private Database db;
     private Scanner scanner;
+    private int userId;
 
-    public DeliveryPerson(Database db) {
+    public DeliveryPerson(Database db, int userId) {
         this.db = db;
         this.scanner = new Scanner(System.in);
+        this.userId = userId;
     }
 
     public void updateDeliveryStatus(int orderId, String status) {

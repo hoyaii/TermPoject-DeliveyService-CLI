@@ -22,12 +22,12 @@ class Main {
                 // 로그인 진행
                 String email = serviceProvider.loginService();
 
-                Integer userId = serviceProvider.getUserIdByEmail(email);
+                int userId = serviceProvider.getUserIdByEmail(email);
                 String role = serviceProvider.getRoleByEmail(email);
 
                 // 기능 선택
                 if (role.equals("Customer")) {
-                    handleCustomer(db);
+                    handleCustomer(db, userId);
                     break;
                 } else if (role.equals("RestaurantOwner")) {
                     handleRestaurantOwner(db, userId);
@@ -49,8 +49,8 @@ class Main {
         scanner.close();
     }
 
-    public static void handleCustomer(Database db) {
-        Customer customer = new Customer(db);
+    public static void handleCustomer(Database db, Integer userId) {
+        Customer customer = new Customer(db, userId);
 
         System.out.println("고객님, 환영합니다! 아래 옵션 중 선택해 주세요:");
         System.out.println("1. 음식점 검색");
@@ -60,7 +60,7 @@ class Main {
 
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
 
         switch (option) {
             case 1:
@@ -85,7 +85,7 @@ class Main {
         }
     }
 
-    public static void handleRestaurantOwner(Database db, Integer userId) {
+    public static void handleRestaurantOwner(Database db, int userId) {
         RestaurantOwner restaurantOwner = new RestaurantOwner(db, userId);
 
         System.out.println("사장님, 환영합니다! 아래 옵션 중 선택해 주세요:");
@@ -126,8 +126,8 @@ class Main {
         }
     }
 
-    public static void handleDeliveryPerson(Database db, Integer userId) {
-        DeliveryPerson deliveryPerson = new DeliveryPerson(db);
+    public static void handleDeliveryPerson(Database db, int userId) {
+        DeliveryPerson deliveryPerson = new DeliveryPerson(db, userId);
 
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();

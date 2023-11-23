@@ -6,10 +6,12 @@ import java.util.Scanner;
 public class Customer {
     private Database db;
     private Scanner scanner;
+    private int userId;
 
-    public Customer(Database db) {
+    public Customer(Database db, int userId) {
         this.db = db;
         this.scanner = new Scanner(System.in);
+        this.userId = userId;
     }
 
     public ResultSet searchRestaurants(String name, String location, String type) {
