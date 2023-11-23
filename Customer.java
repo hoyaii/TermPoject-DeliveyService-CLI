@@ -61,27 +61,45 @@ public class Customer {
         scanner.nextLine();
 
         if (validRestaurantIds.contains(restaurantId)) {
-            menuService(restaurantId);
+            orderService(restaurantId, userId);
         } else {
             System.out.println("유효하지 않은 음식점 ID입니다.");
         }
     }
 
-    public void requestDeliveryService(int restaurantId){ // restarauntId,
+    public boolean requestDelivery(int restaurantId, String address){
         String serviceArea = getServiceArea(restaurantId);
 
         List<Integer> availableDeliveryPersons =  getAvailableDeliveryPeople(serviceArea);
 
-        Random rand = new Random();
+        if(availableDeliveryPersons.isEmpty()){
+            System.out.println("배달 가능한 배달원이 존재하지 않습니다.");
+            return false;
+        }
 
+        Random rand = new Random(); // 가능한 기사중 아무나 한명을 선택한다
         int randomIndex = rand.nextInt(availableDeliveryPersons.size());
-        Integer selectedPerson = availableDeliveryPersons.get(randomIndex);
+        Integer selectedDeliveryPersonId = availableDeliveryPersons.get(randomIndex);
 
+        createDelivery(restaurantId, address, selectedDeliveryPersonId);
 
+        return true;
+    }
 
-        // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
-        // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
-        // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
+    public void createDelivery(int restaurantId, String address, int deliveryPersonId) {
+        String sql = "INSERT INTO Delivery (restaurant_id, delivery_address, delivery_person_id, status) VALUES (?, ?, ?, ?)";
+        String status = "notAccepted";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            preparedStatement.setString(2, address);
+            preparedStatement.setInt(3, deliveryPersonId);
+            preparedStatement.setString(4, status);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQL 쿼리 실행 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
     }
 
     public ResultSet getMenu(int restaurantId) {
@@ -97,7 +115,7 @@ public class Customer {
         }
     }
 
-    public boolean orderMenu(int restaurantId, int menuId) {
+    public boolean createOrder(int restaurantId, int menuId) {
         String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)"; // ******** 수정 필요, 배달원과 동기화
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
@@ -112,7 +130,7 @@ public class Customer {
         }
     }
 
-    public void menuService(int restaurantId){
+    public void orderService(int restaurantId, int userId){
         ResultSet menuResultSet = getMenu(restaurantId);
         try {
             while (menuResultSet.next()) {
@@ -130,17 +148,22 @@ public class Customer {
         int menuId = scanner.nextInt();
         scanner.nextLine();
 
-        boolean orderSuccess = orderMenu(restaurantId, menuId);
-        if (orderSuccess) {
-            System.out.println("주문이 성공적으로 완료되었습니다.");
-        } else {
+        String address = getUserAddress(userId);
+        boolean requestSuccess = requestDelivery(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
+        if (!requestSuccess) {
             System.out.println("주문에 실패하였습니다.");
         }
+
+        boolean orderSuccess = createOrder(restaurantId, menuId); // 주문 생성
+        if (!orderSuccess) {
+            System.out.println("주문에 실패하였습니다.");
+        }
+
+        System.out.println("주문이 성공적으로 완료되었습니다.");
 
         // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
         // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
         // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
-
     }
 
     public String getDeliveryStatus(int orderId) {
@@ -319,6 +342,20 @@ public class Customer {
         }
     }
 
-
-
+    public String getUserAddress(int userId) {
+        String address = null;
+        String sql = "SELECT address FROM User WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                address = resultSet.getString("address");
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL 쿼리 실행 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+        return address;
+    }
 }

@@ -37,6 +37,23 @@ public class DeliveryPerson {
         updateDeliveryStatus(orderId, newStatus);
     }
 
+    // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
+    // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
+    // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
+
+    public ResultSet getDeliveryRequest(int userId){
+        String sql = "SELECT * FROM Delivery WHERE delivery_person_id = ?";
+        try{
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public ResultSet getDeliveryHistory(int deliveryPersonId) {
         String sql = "SELECT * FROM `Order` WHERE delivery_person_id = ?";
         try {
