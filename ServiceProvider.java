@@ -81,10 +81,48 @@ public class ServiceProvider {
         }
     }
 
+    public void registerCustomer(int userId, String address) {
+        String sql = "INSERT INTO Customer (user_id, address) VALUES (?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, address);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
+    public void registerDeliveryPerson(int userId, String serviceArea) {
+        String sql = "INSERT INTO DeliveryPerson (user_id, service_area) VALUES (?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, serviceArea);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
+    public void registerRestaurantOwner(int userId) {
+        String sql = "INSERT INTO RestaurantOwner (user_id) VALUES (?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
     public void registerUserService(){
         String email = null;
         while (email == null || email.isEmpty() || !isValidEmail(email) || getUserIdByEmail(email) != null) {
-            System.out.println("등록할 유저의 이메일을 입력해 주세요:");
+            System.out.println("이메일을 입력해 주세요:");
             email = scanner.nextLine();
             if (email == null || email.isEmpty() || !isValidEmail(email)) {
                 System.out.println("올바른 이메일 형식을 입력해주세요.");
@@ -96,16 +134,13 @@ public class ServiceProvider {
 
         String username = null;
         while (username == null || username.isEmpty()) {
-            System.out.println("등록할 유저의 이름을 입력해 주세요:");
+            System.out.println("이름을 입력해 주세요:");
             username = scanner.nextLine();
-            if (username == null || username.isEmpty()) {
-                System.out.println("이름을 입력해주세요.");
-            }
         }
 
         String password = null;
         while (password == null || password.isEmpty() || !isValidPassword(password)) {
-            System.out.println("등록할 유저의 비밀번호를 입력해 주세요:");
+            System.out.println("비밀번호를 입력해 주세요:");
             password = scanner.nextLine();
             if (password == null || password.isEmpty() || !isValidPassword(password)) {
                 System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
@@ -114,16 +149,44 @@ public class ServiceProvider {
 
         String role = null;
         while (role == null || role.isEmpty() || (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider"))) {
-            System.out.println("등록할 유저의 역할을 입력해 주세요:");
+            System.out.println("역할을 입력해 주세요:");
             role = scanner.nextLine();
             if (role == null || role.isEmpty() || (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider"))) {
                 System.out.println("역할은 'Customer', 'RestaurantOwner', 'DeliveryPerson', 'ServiceProvider' 중 하나여야 합니다.");
             }
         }
 
-        registerUser(email, username, password, role);
-    }
+        String phoneNumber = null;
+        while(phoneNumber == null || phoneNumber.isEmpty()){
+            System.out.println("휴대폰 번호를 입력해 주세요:");
+            phoneNumber = scanner.nextLine();
+        }
 
+        registerUser(email, username, password, role);
+
+        // 역할에 따라 추가 정보 입력
+        int userId = getUserIdByEmail(email);
+
+        if (role.equals("Customer")) {
+            System.out.println("이어서 다음 정보를 입력해주세요.");
+
+            System.out.println("배달을 수령할 주소를 입력해 주세요:");
+            String address = scanner.nextLine();
+
+            registerCustomer(userId, address);
+
+        } else if (role.equals("RestaurantOwner")) {
+            registerRestaurantOwner(userId);
+
+        } else if (role.equals("DeliveryPerson")) {
+            System.out.println("이어서 다음 정보를 입력해주세요.");
+
+            System.out.println("배달 지역을 입력해 주세요:");
+            String serviceArea = scanner.nextLine();
+
+            registerDeliveryPerson(userId, serviceArea);
+        }
+    }
 
     public void updateUser(int userId, String username, String password, String role) { // email은 unique해야 해서 수정이 불가능하다
         String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";
