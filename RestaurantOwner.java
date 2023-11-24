@@ -212,22 +212,49 @@ public class RestaurantOwner {
                 break;
 
             case 2:
+                int menuSize = printMenuList(restaurantId);
+
                 System.out.println("수정할 메뉴의 ID를 입력해 주세요:");
-                int updateId = scanner.nextInt();
-                scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
-                System.out.println("수정할 메뉴의 새로운 이름을 입력해 주세요:");
-                String updateName = scanner.nextLine();
-                System.out.println("수정할 메뉴의 새로운 가격을 입력해 주세요:");
-                double updatePrice = scanner.nextDouble();
-                scanner.nextLine();  // nextDouble 후에 남은 개행문자 처리
-                updateMenu(updateId, updateName, updatePrice);
+                int menuId = scanner.nextInt();
+                scanner.nextLine();
+                while(menuId < 0 && menuId > menuSize){
+                    System.out.println("유요하지 않은 ID 입니다.");
+                    menuId = scanner.nextInt();
+                    scanner.nextLine();
+                }
+
+                System.out.println("새로운 이름을 입력해 주세요:");
+                String newName = scanner.nextLine();
+                while(newName == null || newName.isEmpty()){
+                    System.out.println("아무것도 입력하지 않으셨습니다.");
+                    newName = scanner.nextLine();
+                }
+
+                System.out.println("새로운 가격을 입력해 주세요:");
+                double newPrice = scanner.nextDouble();
+                scanner.nextLine();
+                while(newPrice <= 0){
+                    System.out.println("올바른 액수를 입력해주세요.");
+                    newPrice = scanner.nextDouble();
+                    scanner.nextLine();
+                }
+
+                updateMenu(menuId, newName, newPrice);
                 break;
 
             case 3:
+                menuSize = printMenuList(restaurantId);
+
                 System.out.println("삭제할 메뉴의 ID를 입력해 주세요:");
-                int deleteId = scanner.nextInt();
-                scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
-                deleteMenu(deleteId);
+                menuId = scanner.nextInt();
+                scanner.nextLine();
+                while(menuId < 0 && menuId > menuSize){
+                    System.out.println("유요하지 않은 ID 입니다.");
+                    menuId = scanner.nextInt();
+                    scanner.nextLine();
+                }
+
+                deleteMenu(menuId);
                 break;
 
             default:
@@ -252,6 +279,15 @@ public class RestaurantOwner {
         }
 
         return menuNameList;
+    }
+
+    public int printMenuList(int restaurantId){
+        List<String> menuNameList = getMenuList(restaurantId);
+        for(int i = 0; i < menuNameList.size(); i++){
+            System.out.println(i + ". " + menuNameList.get(i));
+        }
+
+        return menuNameList.size();
     }
 
     public void processOrder(int orderId, String status) {
