@@ -359,6 +359,8 @@ public class RestaurantOwner {
         String restaurantName = scanner.nextLine();
         Integer restaurantId = getRestaurantIdByName(restaurantName);
 
+
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("처리할 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
@@ -370,6 +372,29 @@ public class RestaurantOwner {
 
         ////////////////////////////////////////////////////
     }
+
+    public List<Integer> getOrderIdsByRestaurantId(int restaurantId) {
+        String sql = "SELECT order_id FROM Orders WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            List<Integer> orderIds = new ArrayList<>();
+
+            while (resultSet.next()) {
+                orderIds.add(resultSet.getInt("order_id"));
+            }
+
+            return orderIds;
+
+        } catch (SQLException e) {
+            System.out.println("SQL 질의 실행 중 오류가 발생했습니다.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     public ResultSet getOrderHistory(int restaurantId) {
         String sql = "SELECT * FROM Orders WHERE menu_id IN (SELECT menu_id FROM Menu WHERE restaurant_id = ?)";
