@@ -14,53 +14,13 @@ public class DeliveryPerson {
         this.userId = userId;
     }
 
-    public void updateDeliveryStatus(int orderId, String status) {
-        String sql = "UPDATE `Order` SET order_status = ? WHERE order_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, status);
-            preparedStatement.setInt(2, orderId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-        }
-    }
-
-    public void updateDeliveryStatusService(){
-        System.out.println("배달 상태를 업데이트할 주문 ID를 입력해 주세요:");
-        int orderId = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
-        System.out.println("새로운 배달 상태를 입력해 주세요:");
-        String newStatus = scanner.nextLine();
-
-        updateDeliveryStatus(orderId, newStatus);
-    }
-
-    public ResultSet getDeliveryRequest(int userId){
-        String sql = "SELECT * FROM Delivery WHERE delivery_person_id = ?";
+    public ResultSet getDeliveryList(int userId, String status){
+        String sql = "SELECT * FROM Delivery WHERE delivery_person_id = ? AND status = ?";
         try{
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, status);
             return preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public String getRestaurantAddress(int restaurantId) {
-        String sql = "SELECT address FROM Restaurant  WHERE restaurant_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, restaurantId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getString("address");
-            } else {
-                return null;
-            }
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
@@ -70,7 +30,7 @@ public class DeliveryPerson {
 
     public void getDeliveryRequestService(int userId){ //  배달원이 요청 리스트를 보고 승낙하여 매칭
         System.out.println("요청이 들어온 배달 목록들입니다. 수락하고 싶은 배달을 선택해 주세요");
-        ResultSet resultSet = getDeliveryRequest(userId);
+        ResultSet resultSet = getDeliveryList(userId, "notAccepted");
 
         try {
             if(resultSet.wasNull()){
@@ -96,9 +56,8 @@ public class DeliveryPerson {
         acceptDelivery(deliveryId);
     }
 
-    public void acceptDelivery(int deliveryId) {
+    public void updateDeliveryStatus(String status, int deliveryId) {
         String sql = "UPDATE Delivery SET status = ? WHERE delivery_id = ?";
-        String status = "accepted";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, status);
@@ -108,6 +67,49 @@ public class DeliveryPerson {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
         }
+    }
+
+    public void updateOrderStatus(String status, int orderId) {
+        String sql = "UPDATE `Order` SET status = ? WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, status);
+            preparedStatement.setInt(2, orderId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
+    public void finishDeliveryService(int userId){
+        System.out.println("진행중인 배달 내역입니다.");
+        ResultSet resultSet = getDeliveryList(userId, "accepted");
+
+        try {
+            if(resultSet.wasNull()){
+                System.out.println("배달 목록이 없습니다.");
+                return;
+            }
+
+            while (resultSet.next()) {
+                int deliveryId = resultSet.getInt("delivery_id ");
+                int restaurantId = resultSet.getInt("restaurant_id");
+                String deliveryAddress = resultSet.getString("delivery_address");
+                String restaurantAddress = getRestaurantAddress(restaurantId);
+                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving delivery history.");
+            e.printStackTrace();
+        }
+
+        System.out.println("완료한 배달의 ID를 입력해 주세요:");
+        int deliveryId = scanner.nextInt();
+        scanner.nextLine();
+
+        updateDeliveryStatus("finished", deliveryId);
+        updateOrderStatus(orderId, newStatus);
     }
 
     public ResultSet getDeliveryHistory(int deliveryPersonId) {
@@ -163,6 +165,38 @@ public class DeliveryPerson {
         } catch (SQLException e) {
             System.out.println("Error retrieving delivery list.");
             e.printStackTrace();
+        }
+    }
+
+    public void acceptDelivery(int deliveryId) {
+        String sql = "UPDATE Delivery SET status = ? WHERE delivery_id = ?";
+        String status = "accepted";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, status);
+            preparedStatement.setInt(2, deliveryId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
+    public String getRestaurantAddress(int restaurantId) {
+        String sql = "SELECT address FROM Restaurant  WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("address");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
         }
     }
 }

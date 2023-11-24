@@ -1,6 +1,3 @@
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.Scanner;
 
 class Main {
@@ -72,11 +69,11 @@ class Main {
                 break;
 
             case 3:
-                customer.getDeliveryStatusService(userId);
+                customer.getDeliveryStatusService();
                 break;
 
             case 4:
-                customer.writeReviewService(userId);
+                customer.writeReviewService();
                 break;
 
             default:
@@ -144,7 +141,7 @@ class Main {
                 break;
 
             case 2:
-                deliveryPerson.updateDeliveryStatusService();
+                deliveryPerson.finishDeliveryService(userId);
                 break;
 
             case 3:

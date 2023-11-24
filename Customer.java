@@ -61,7 +61,7 @@ public class Customer {
         scanner.nextLine();
 
         if (validRestaurantIds.contains(restaurantId)) {
-            orderService(restaurantId, userId);
+            orderService(restaurantId);
         } else {
             System.out.println("유효하지 않은 음식점 ID입니다.");
         }
@@ -130,7 +130,7 @@ public class Customer {
         }
     }
 
-    public void orderService(int restaurantId, int userId){
+    public void orderService(int restaurantId){
         ResultSet menuResultSet = getMenu(restaurantId);
         try {
             while (menuResultSet.next()) {
@@ -159,7 +159,7 @@ public class Customer {
             System.out.println("주문에 실패하였습니다.");
         }
 
-        System.out.println("주문이 성공적으로 완료되었습니다.");
+        System.out.println("주문이 성공적으로 요청되었습니다.");
 
         // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
         // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
@@ -184,8 +184,8 @@ public class Customer {
         }
     }
 
-    public void getDeliveryStatusService(int userId){
-        List<Integer> userOrders = getUserOrders(userId);
+    public void getDeliveryStatusService(){
+        List<Integer> userOrders = getUserOrders();
 
         if (userOrders.isEmpty()) {
             System.out.println("주문이 없습니다.");
@@ -236,7 +236,7 @@ public class Customer {
         }
     }
 
-    public void writeReviewService(int userId){
+    public void writeReviewService(){
         System.out.println("리뷰를 작성할 음식점의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
         System.out.println("리뷰의 별점을 입력해 주세요:");
@@ -248,8 +248,8 @@ public class Customer {
         writeReview(restaurantName, rating, reviewContent);
     }
 
-    public List<Integer> getUserOrders(int userId) {
-        String sql = "SELECT order_id FROM Orders WHERE user_id = ?";
+    public List<Integer> getUserOrders() {
+        String sql = "SELECT order_id FROM Orders WHERE customer_id = ?";
         List<Integer> orderIds = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
