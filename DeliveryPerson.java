@@ -56,6 +56,7 @@ public class DeliveryPerson {
         int deliveryId = scanner.nextInt();
         scanner.nextLine();
         updateDeliveryStatus("accepted", deliveryId);
+        System.out.println("요청이 수락되었습니다.");
     }
 
     public void updateDeliveryStatus(String status, int deliveryId) {

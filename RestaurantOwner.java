@@ -1,6 +1,8 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -336,13 +338,21 @@ public class RestaurantOwner {
         System.out.println("주문 이력을 조회할 음식점의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
         Integer restaurantId = getRestaurantIdByName(restaurantName);
+
         if (restaurantId != null) {
             ResultSet orderHistory = getOrderHistory(restaurantId);
             try {
                 while (orderHistory.next()) {
                     int orderId = orderHistory.getInt("order_id");
-                    String orderStatus = orderHistory.getString("order_status");
-                    System.out.println("주문 ID: " + orderId + ", 주문 상태: " + orderStatus);
+                    String orderStatus = orderHistory.getString("status");
+                    int menuId = orderHistory.getInt("menu_id");
+                    Timestamp orderTime = orderHistory.getTimestamp("order_time");
+
+                    LocalDateTime orderDateTime = orderTime.toLocalDateTime();
+                    String formattedOrderTime = orderDateTime.toString();
+                    String menuName = getMenuName(menuId);
+
+                    System.out.println("주문 ID: " + orderId + " 메뉴명: "+ menuName + " 주문 상태: " + orderStatus + " 주문 시간: " + formattedOrderTime);
                 }
             } catch (SQLException e) {
                 System.out.println("Error retrieving order history.");
@@ -362,6 +372,25 @@ public class RestaurantOwner {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("restaurant_id");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getMenuName(int menuId) { ////////////////////////// 중복
+        String sql = "SELECT name  FROM Menu WHERE menu_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, menuId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("name");
             } else {
                 return null;
             }

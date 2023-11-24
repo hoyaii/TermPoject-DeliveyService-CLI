@@ -202,7 +202,7 @@ public class Customer {
         }
 
         for (Integer orderId : userOrders) {
-            System.out.println("메뉴명: " + getMenuNameFromOrder(orderId) + ", 주문 ID: " + orderId);
+            System.out.println("메뉴명: " + getMenuNamByOrderId(orderId) + ", 주문 ID: " + orderId);
         }
 
         System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
@@ -275,7 +275,7 @@ public class Customer {
         return orderIds;
     }
 
-    public String getMenuNameFromOrder(int orderId) {
+    public String getMenuNamByOrderId(int orderId) {
         String sql = "SELECT m.name FROM Orders o JOIN Menu m ON o.menu_id = m.menu_id WHERE o.order_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
