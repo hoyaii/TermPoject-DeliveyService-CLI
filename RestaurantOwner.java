@@ -132,7 +132,6 @@ public class RestaurantOwner {
         }
     }
 
-
     public void registerMenu(int restaurantId, String name, double price) { // 메뉴 및 가격 등록
         String sql = "INSERT INTO Menu (name, price, restaurant_id) VALUES (?, ?, ?)";
         try {
@@ -174,6 +173,15 @@ public class RestaurantOwner {
     }
 
     public void manageMenuService() {
+        System.out.println("추가할 메뉴가 속한 식당의 이름을 입력해 주세요:");
+        String restaurantName = scanner.nextLine();
+        Integer restaurantId = getRestaurantIdByName(restaurantName);
+
+        if (restaurantId == null) {
+            System.out.println("해당 이름의 식당이 없습니다.");
+            return;
+        }
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("메뉴 관리:");
         System.out.println("1. 메뉴 추가");
@@ -185,18 +193,22 @@ public class RestaurantOwner {
         switch (option) {
             case 1:
                 System.out.println("추가할 메뉴의 이름을 입력해 주세요:");
-                String addName = scanner.nextLine();
-                System.out.println("추가할 메뉴의 가격을 입력해 주세요:");
-                double addPrice = scanner.nextDouble();
-                scanner.nextLine();  // nextDouble 후에 남은 개행문자 처리
-                System.out.println("추가할 메뉴가 속한 식당의 이름을 입력해 주세요:");
-                String restaurantName = scanner.nextLine();
-                Integer restaurantId = getRestaurantIdByName(restaurantName);
-                if (restaurantId != null) {
-                    registerMenu(restaurantId, addName, addPrice);
-                } else {
-                    System.out.println("해당 이름의 식당이 없습니다.");
+                String name = scanner.nextLine();
+                while(name == null || name.isEmpty()){
+                    System.out.println("아무것도 입력하지 않으셨습니다.");
+                    name = scanner.nextLine();
                 }
+
+                System.out.println("추가할 메뉴의 가격을 입력해 주세요:");
+                double price = scanner.nextDouble();
+                scanner.nextLine();  // nextDouble 후에 남은 개행문자 처리
+                while(price <= 0){
+                    System.out.println("올바른 액수를 입력해주세요.");
+                    price = scanner.nextDouble();
+                    scanner.nextLine();
+                }
+
+                registerMenu(restaurantId, name, price);
                 break;
 
             case 2:
@@ -222,6 +234,24 @@ public class RestaurantOwner {
                 System.out.println("잘못된 선택입니다.");
                 break;
         }
+    }
+
+    public List<String> getMenuList(int restaurantId){
+        String sql = "SELECT name FROM Menu WHERE restaurant_id = ?";
+        List<String> menuNameList = new ArrayList<>();
+        try{
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            ResultSet resultSet  =preparedStatement.executeQuery();
+            while(resultSet.next()){
+                menuNameList.add(resultSet.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+
+        return menuNameList;
     }
 
     public void processOrder(int orderId, String status) {
