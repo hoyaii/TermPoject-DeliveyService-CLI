@@ -93,6 +93,11 @@ public class RestaurantOwner {
     }
 
     public void updateRestaurantInfoService(){
+        if(printRestaurantList() == 0){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+
         System.out.println("정보를 업데이트할 음식점의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
 
@@ -175,6 +180,11 @@ public class RestaurantOwner {
     }
 
     public void manageMenuService() {
+        if(printRestaurantList() == 0){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+
         System.out.println("추가할 메뉴가 속한 식당의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
         Integer restaurantId = getRestaurantIdByName(restaurantName);
@@ -340,6 +350,15 @@ public class RestaurantOwner {
     }
 
     public void manageOrderService() {
+        if(printRestaurantList() == 0){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+
+        System.out.println("주문을 처리할 식당의 이름을 입력해 주세요:");
+        String restaurantName = scanner.nextLine();
+        Integer restaurantId = getRestaurantIdByName(restaurantName);
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("처리할 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
@@ -366,6 +385,7 @@ public class RestaurantOwner {
     }
 
     public void getOrderHistoryService(){
+        printRestaurantList();
         System.out.println("주문 이력을 조회할 음식점의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
         Integer restaurantId = getRestaurantIdByName(restaurantName);
