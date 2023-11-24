@@ -89,7 +89,7 @@ class Main {
         System.out.println("1. 음식점 정보 등록");
         System.out.println("2. 음식점 정보 업데이트");
         System.out.println("3. 메뉴 관리");
-        System.out.println("4. 주문 처리");
+        System.out.println("4. 조리 완료 업데이트");
         System.out.println("5. 주문 이력 조회");
 
         Scanner scanner = new Scanner(System.in);
@@ -110,7 +110,7 @@ class Main {
                 break;
 
             case 4:
-                restaurantOwner.manageOrderService();
+                restaurantOwner.finishCookedService();
                 break;
 
             case 5:

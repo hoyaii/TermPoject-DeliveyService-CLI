@@ -93,13 +93,13 @@ public class RestaurantOwner {
     }
 
     public void updateRestaurantInfoService(){
-        if(printRestaurantList() == 0){
+        if(!printRestaurantList(getRestaurantList())){
             System.out.println("관리하고 있는 식당이 없습니다.");
             return;
         }
 
-        System.out.println("정보를 업데이트할 음식점의 이름을 입력해 주세요:");
-        String restaurantName = scanner.nextLine();
+        System.out.println("정보를 업데이트할 음식점의 id를 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
 
         System.out.println("업데이트할 음식점의 이름을 입력해 주세요:");
         String newName = scanner.nextLine();
@@ -128,8 +128,6 @@ public class RestaurantOwner {
             System.out.println("아무것도 입력하지 않으셨습니다.");
             newServiceArea = scanner.nextLine();
         }
-
-        Integer restaurantId = getRestaurantIdByName(restaurantName); // restaurantId를 구한다
 
         boolean updateSuccess = updateRestaurantInfo(restaurantId, newName, newAddress, newCuisineType, newServiceArea);
         if (updateSuccess) {
@@ -180,19 +178,15 @@ public class RestaurantOwner {
     }
 
     public void manageMenuService() {
-        if(printRestaurantList() == 0){
+        if(!printRestaurantList(getRestaurantList())){
             System.out.println("관리하고 있는 식당이 없습니다.");
             return;
         }
 
-        System.out.println("추가할 메뉴가 속한 식당의 이름을 입력해 주세요:");
-        String restaurantName = scanner.nextLine();
-        Integer restaurantId = getRestaurantIdByName(restaurantName);
+        System.out.println("추가할 메뉴가 속한 식당의 id을 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
 
-        if (restaurantId == null) {
-            System.out.println("해당 이름의 식당이 없습니다.");
-            return;
-        }
+        // restaurantId가 존재하는 것인지 확인하는 로직 필요 *****************************
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("메뉴 관리:");
@@ -275,32 +269,38 @@ public class RestaurantOwner {
         }
     }
 
-    public List<String> getRestaurantList() {
+    public ResultSet getRestaurantList() {
         String sql = "SELECT name FROM Restaurant WHERE owner_id = ?";
-        List<String> restaurantNameList = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
-
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                restaurantNameList.add(resultSet.getString("name"));
-            }
+            return preparedStatement.executeQuery();
         } catch (SQLException e) {
             System.out.println("SQL 실행 중 오류가 발생했습니다.");
             e.printStackTrace();
+            return null;
         }
-
-        return restaurantNameList;
     }
 
-    public int printRestaurantList(){
-        List<String> restaurantNameList = getRestaurantList();
-        for(int i = 0; i < restaurantNameList.size(); i++){
-            System.out.println(i + ". " + restaurantNameList.get(i));
-        }
+    public boolean printRestaurantList(ResultSet restaurantSet){
+        try {
+            if(restaurantSet.wasNull()){
+                return false;
+            }
 
-        return restaurantNameList.size();
+            while (restaurantSet.next()) {
+                int restaurantId = restaurantSet.getInt("restaurant_id");
+                String name = restaurantSet.getString("name");
+
+                System.out.println("식당 ID: " + restaurantId + " 식당 이름: "+ name);
+            }
+
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error retrieving order history.");
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public List<String> getMenuList(int restaurantId){
@@ -331,17 +331,17 @@ public class RestaurantOwner {
         return menuNameList.size();
     }
 
-    public void processOrder(int orderId, String status) {
-        String sql = "UPDATE Orders SET order_status = ? WHERE order_id = ?";
+    public void updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE Orders SET status = ? WHERE order_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, status);
             preparedStatement.setInt(2, orderId);
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
-                System.out.println("주문 처리가 완료되었습니다.");
+                System.out.println("처리가 완료되었습니다.");
             } else {
-                System.out.println("주문 처리에 실패하였습니다.");
+                System.out.println("처리가 실패하였습니다.");
             }
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
@@ -349,45 +349,32 @@ public class RestaurantOwner {
         }
     }
 
-    public void manageOrderService() {
-        if(printRestaurantList() == 0){
+    public void finishCookedService() {
+        if(!printRestaurantList(getRestaurantList())){
             System.out.println("관리하고 있는 식당이 없습니다.");
             return;
         }
 
-        System.out.println("주문을 처리할 식당의 이름을 입력해 주세요:");
-        String restaurantName = scanner.nextLine();
-        Integer restaurantId = getRestaurantIdByName(restaurantName);
+        System.out.println("주문을 처리할 식당의 id를 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
 
-
+        ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
+        printOrderSet(orderSet); // order 정보들 출력
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("처리할 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
         scanner.nextLine();
-        System.out.println("주문의 새로운 상태를 입력해 주세요:");
-        String status = scanner.nextLine();
 
-        processOrder(orderId, status);
-
-        ////////////////////////////////////////////////////
+        updateOrderStatus(orderId, "cooked");
     }
 
-    public List<Integer> getOrderIdsByRestaurantId(int restaurantId) {
-        String sql = "SELECT order_id FROM Orders WHERE restaurant_id = ?";
+    public ResultSet getOrdersByRestaurantId(int restaurantId) { // deliveryMatched 상태의 Order들을 얻는다
+        String sql = "SELECT * FROM Orders WHERE restaurant_id = ? AND status = 'deliveryMatched'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, restaurantId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            List<Integer> orderIds = new ArrayList<>();
-
-            while (resultSet.next()) {
-                orderIds.add(resultSet.getInt("order_id"));
-            }
-
-            return orderIds;
-
+            return preparedStatement.executeQuery();
         } catch (SQLException e) {
             System.out.println("SQL 질의 실행 중 오류가 발생했습니다.");
             e.printStackTrace();
@@ -410,32 +397,39 @@ public class RestaurantOwner {
     }
 
     public void getOrderHistoryService(){
-        printRestaurantList();
-        System.out.println("주문 이력을 조회할 음식점의 이름을 입력해 주세요:");
-        String restaurantName = scanner.nextLine();
-        Integer restaurantId = getRestaurantIdByName(restaurantName);
+        if(!printRestaurantList(getRestaurantList())){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+        System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
 
-        if (restaurantId != null) {
-            ResultSet orderHistory = getOrderHistory(restaurantId);
-            try {
-                while (orderHistory.next()) {
-                    int orderId = orderHistory.getInt("order_id");
-                    String orderStatus = orderHistory.getString("status");
-                    int menuId = orderHistory.getInt("menu_id");
-                    Timestamp orderTime = orderHistory.getTimestamp("order_time");
+        ResultSet orderHistory = getOrderHistory(restaurantId);
+        printOrderSet(orderHistory);
+    }
 
-                    LocalDateTime orderDateTime = orderTime.toLocalDateTime();
-                    String formattedOrderTime = orderDateTime.toString();
-                    String menuName = getMenuName(menuId);
-
-                    System.out.println("주문 ID: " + orderId + " 메뉴명: "+ menuName + " 주문 상태: " + orderStatus + " 주문 시간: " + formattedOrderTime);
-                }
-            } catch (SQLException e) {
-                System.out.println("Error retrieving order history.");
-                e.printStackTrace();
+    public void printOrderSet(ResultSet orderSet){
+        try {
+            if(orderSet.wasNull()){
+                System.out.println("처리할 주문이 없습니다.");
+                return;
             }
-        } else {
-            System.out.println("해당 이름의 식당이 없습니다.");
+
+            while (orderSet.next()) {
+                int orderId = orderSet.getInt("order_id");
+                String orderStatus = orderSet.getString("status");
+                int menuId = orderSet.getInt("menu_id");
+                Timestamp orderTime = orderSet.getTimestamp("order_time");
+
+                LocalDateTime orderDateTime = orderTime.toLocalDateTime();
+                String formattedOrderTime = orderDateTime.toString();
+                String menuName = getMenuName(menuId);
+
+                System.out.println("주문 ID: " + orderId + " 메뉴명: "+ menuName + " 주문 상태: " + orderStatus + " 주문 시간: " + formattedOrderTime);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving order history.");
+            e.printStackTrace();
         }
     }
 
