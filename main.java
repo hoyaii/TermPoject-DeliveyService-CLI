@@ -132,20 +132,20 @@ class Main {
 
         System.out.println("배달원님, 환영합니다! 아래 옵션 중 선택해 주세요:");
         System.out.println("1. 배달 요청 확인 및 수락");
-        System.out.println("2. 배달 상태 업데이트");
+        System.out.println("2. 배달 완료 업데이트");
         System.out.println("3. 배달 이력 확인");
 
         switch (option) {
             case 1:
-                deliveryPerson.getDeliveryRequestService(userId);
+                deliveryPerson.getDeliveryRequestService();
                 break;
 
             case 2:
-                deliveryPerson.finishDeliveryService(userId);
+                deliveryPerson.finishDeliveryService();
                 break;
 
             case 3:
-                deliveryPerson.getDeliveryHistoryService(userId);
+                deliveryPerson.getDeliveryHistoryService();
                 break;
 
             default:
