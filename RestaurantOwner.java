@@ -53,14 +53,14 @@ public class RestaurantOwner {
         String cuisineType = scanner.nextLine();
         while(cuisineType == null || cuisineType.isEmpty()){
             System.out.println("아무것도 입력하지 않으셨습니다.");
-            name = scanner.nextLine();
+            cuisineType = scanner.nextLine();
         }
 
         System.out.println("배달 서비스를 제공할 지역을 입력해 주세요:");
         String serviceArea = scanner.nextLine();
         while(serviceArea == null || serviceArea.isEmpty()){
             System.out.println("아무것도 입력하지 않으셨습니다.");
-            name = scanner.nextLine();
+            serviceArea = scanner.nextLine();
         }
 
         boolean registerSuccess = registerRestaurant(name, address, cuisineType, serviceArea);
@@ -71,14 +71,16 @@ public class RestaurantOwner {
         }
     }
 
-    public boolean updateRestaurantInfo(int restaurantId, String name, String address, String cuisineType) {
-        String sql = "UPDATE Restaurant SET name = ?, address = ?, cuisine_type = ? WHERE owner_id = ?";
+    public boolean updateRestaurantInfo(int restaurantId, String name, String address, String cuisineType, String serviceArea) {
+        String sql = "UPDATE Restaurant SET name = ?, address = ?, cuisine_type = ?, service_area = ? WHERE restaurant_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, address);
             preparedStatement.setString(3, cuisineType);
-            preparedStatement.setInt(4, restaurantId);
+            preparedStatement.setString(4, serviceArea);
+            preparedStatement.setInt(5, restaurantId);
+
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
@@ -89,18 +91,40 @@ public class RestaurantOwner {
     }
 
     public void updateRestaurantInfoService(){
-        System.out.println("기존의 음식점의 이름을 입력해 주세요:");
+        System.out.println("정보를 업데이트할 음식점의 이름을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
+
         System.out.println("업데이트할 음식점의 이름을 입력해 주세요:");
-        String updateName = scanner.nextLine();
+        String newName = scanner.nextLine();
+        while(newName == null || newName.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            newName = scanner.nextLine();
+        }
+
         System.out.println("업데이트할 음식점의 위치를 입력해 주세요:");
-        String updateLocation = scanner.nextLine();
-        System.out.println("업데이트할 음식점의 음식 종류를 입력해 주세요:");
-        String updateType = scanner.nextLine();
+        String newAddress = scanner.nextLine();
+        while(newAddress == null || newAddress.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            newAddress = scanner.nextLine();
+        }
+
+        System.out.println("업데이트할 음식점의 카테고리를 입력해 주세요:");
+        String newCuisineType = scanner.nextLine();
+        while(newCuisineType == null || newCuisineType.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            newCuisineType = scanner.nextLine();
+        }
+
+        System.out.println("업데이트할 음식점의 서비스 지역을 입력해 주세요:");
+        String newServiceArea = scanner.nextLine();
+        while(newServiceArea == null || newServiceArea.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            newServiceArea = scanner.nextLine();
+        }
 
         Integer restaurantId = getRestaurantIdByName(restaurantName); // restaurantId를 구한다
 
-        boolean updateSuccess = updateRestaurantInfo(restaurantId, updateName, updateLocation, updateType);
+        boolean updateSuccess = updateRestaurantInfo(restaurantId, newName, newAddress, newCuisineType, newServiceArea);
         if (updateSuccess) {
             System.out.println("음식점 정보가 성공적으로 업데이트되었습니다.");
         } else {
