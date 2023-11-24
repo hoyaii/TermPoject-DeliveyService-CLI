@@ -167,12 +167,29 @@ public class ServiceProvider {
         int userId = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("새로운 이름을 입력해 주세요:");
-        String newName = scanner.nextLine();
-        System.out.println("새로운 역할을 입력해 주세요:");
-        String newRole = scanner.nextLine();
-        System.out.println("새로운 비밀번호를 입력해 주세요:");
-        String newPassword = scanner.nextLine();
+        String newName = null;
+        while (newName == null || newName.isEmpty()) {
+            System.out.println("새로운 이름을 입력해 주세요:");
+            newName = scanner.nextLine();
+        }
+
+        String newPassword = null;
+        while (newPassword == null || newPassword.isEmpty() || !isValidPassword(newPassword)) {
+            System.out.println("새로운 비밀번호를 입력해 주세요:");
+            newPassword = scanner.nextLine();
+            if (newPassword == null || newPassword.isEmpty() || !isValidPassword(newPassword)) {
+                System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
+            }
+        }
+
+        String newRole = null;
+        while (newRole == null || newRole.isEmpty() || (!newRole.equals("Customer") && !newRole.equals("RestaurantOwner") && !newRole.equals("DeliveryPerson") && !newRole.equals("ServiceProvider"))) {
+            System.out.println("새로운 역할을 입력해 주세요:");
+            newRole = scanner.nextLine();
+            if (newRole == null || newRole.isEmpty() || (!newRole.equals("Customer") && !newRole.equals("RestaurantOwner") && !newRole.equals("DeliveryPerson") && !newRole.equals("ServiceProvider"))) {
+                System.out.println("역할은 'Customer', 'RestaurantOwner', 'DeliveryPerson', 'ServiceProvider' 중 하나여야 합니다.");
+            }
+        }
 
         updateUser(userId, newName, newPassword, newRole);
     }
@@ -197,7 +214,7 @@ public class ServiceProvider {
         deleteUser(userId);
     }
 
-    public Integer getUserIdByEmail(String email) { // userId 구하기
+    public Integer getUserIdByEmail(String email) {
         String sql = "SELECT user_id FROM User WHERE email = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);

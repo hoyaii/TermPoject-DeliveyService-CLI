@@ -13,17 +13,18 @@ public class RestaurantOwner {
     public RestaurantOwner(Database db, int userId) {
         this.db = db;
         this.scanner = new Scanner(System.in);
-        this.userId = userId;  // ownerId 초기화
+        this.userId = userId;
     }
 
-    public boolean registerRestaurant(String name, String address, String cuisineType) {
-        String sql = "INSERT INTO Restaurant (name, address, cuisine_type, owner_id) VALUES (?, ?, ?, ?)";
+    public boolean registerRestaurant(String name, String address, String cuisineType, String serviceArea) {
+        String sql = "INSERT INTO Restaurant (name, address, cuisine_type, owner_id, service_area) VALUES (?, ?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, address);
             preparedStatement.setString(3, cuisineType);
-            preparedStatement.setInt(4, this.userId);
+            preparedStatement.setInt(4, userId);
+            preparedStatement.setString(5, serviceArea);
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
@@ -35,13 +36,34 @@ public class RestaurantOwner {
 
     public void registerRestaurantService(){
         System.out.println("등록할 음식점의 이름을 입력해 주세요:");
-        String registerName = scanner.nextLine();
-        System.out.println("등록할 음식점의 위치를 입력해 주세요:");
-        String registerLocation = scanner.nextLine();
-        System.out.println("등록할 음식점의 음식 종류를 입력해 주세요:");
-        String registerType = scanner.nextLine();
+        String name = scanner.nextLine();
+        while(name == null || name.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            name = scanner.nextLine();
+        }
 
-        boolean registerSuccess = registerRestaurant(registerName, registerLocation, registerType);
+        System.out.println("등록할 음식점의 위치를 입력해 주세요:");
+        String address = scanner.nextLine();
+        while(address == null || address.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            address = scanner.nextLine();
+        }
+
+        System.out.println("등록할 음식점의 음식 종류를 입력해 주세요:");
+        String cuisineType = scanner.nextLine();
+        while(cuisineType == null || cuisineType.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            name = scanner.nextLine();
+        }
+
+        System.out.println("배달 서비스를 제공할 지역을 입력해 주세요:");
+        String serviceArea = scanner.nextLine();
+        while(serviceArea == null || serviceArea.isEmpty()){
+            System.out.println("아무것도 입력하지 않으셨습니다.");
+            name = scanner.nextLine();
+        }
+
+        boolean registerSuccess = registerRestaurant(name, address, cuisineType, serviceArea);
         if (registerSuccess) {
             System.out.println("음식점 정보가 성공적으로 등록되었습니다.");
         } else {
