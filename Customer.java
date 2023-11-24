@@ -3,6 +3,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Customer {
@@ -116,11 +117,19 @@ public class Customer {
     }
 
     public boolean createOrder(int restaurantId, int menuId) {
-        String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)"; // ******** 수정 필요, 배달원과 동기화
+        String sql = "INSERT INTO Orders (restaurant_id, menu_id, customer_id, status, order_time) VALUES (?, ?, ?, ?, ?)";
+
+        // order_time 구하기
+        LocalDateTime currentTime = LocalDateTime.now();
+        Timestamp timestamp = Timestamp.valueOf(currentTime);
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, restaurantId);
             preparedStatement.setInt(2, menuId);
+            preparedStatement.setInt(3, userId);
+            preparedStatement.setString(4, "notMatched");
+            preparedStatement.setTimestamp(5, timestamp);
+
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {

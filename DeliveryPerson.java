@@ -53,7 +53,7 @@ public class DeliveryPerson {
         System.out.println("수락하고 싶은 요청의 id를 입력하세요.");
         int deliveryId = scanner.nextInt();
         scanner.nextLine();
-        acceptDelivery(deliveryId);
+        updateDeliveryStatus("accepted", deliveryId);
     }
 
     public void updateDeliveryStatus(String status, int deliveryId) {
@@ -82,21 +82,6 @@ public class DeliveryPerson {
         }
     }
 
-    public boolean createOrder(int restaurantId, int menuId) {
-        String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)"; // ******** 수정 필요, 배달원과 동기화
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, restaurantId);
-            preparedStatement.setInt(2, menuId);
-            int affectedRows = preparedStatement.executeUpdate();
-            return affectedRows > 0;
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public void finishDeliveryService(int userId){
         System.out.println("진행중인 배달 내역입니다.");
         ResultSet resultSet = getDeliveryList(userId, "accepted");
@@ -115,13 +100,14 @@ public class DeliveryPerson {
                 System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
             }
         } catch (SQLException e) {
-            System.out.println("Error retrieving delivery history.");
             e.printStackTrace();
         }
 
         System.out.println("완료한 배달의 ID를 입력해 주세요:");
         int deliveryId = scanner.nextInt();
         scanner.nextLine();
+
+        Integer orderId = getOrderIdByDeliveryId(deliveryId); // deliveryId를 가지고 orderId를 구한다
 
         updateDeliveryStatus("finished", deliveryId);
         updateOrderStatus("finished", orderId);
@@ -183,20 +169,6 @@ public class DeliveryPerson {
         }
     }
 
-    public void acceptDelivery(int deliveryId) {
-        String sql = "UPDATE Delivery SET status = ? WHERE delivery_id = ?";
-        String status = "accepted";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, status);
-            preparedStatement.setInt(2, deliveryId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-        }
-    }
-
     public String getRestaurantAddress(int restaurantId) {
         String sql = "SELECT address FROM Restaurant  WHERE restaurant_id = ?";
         try {
@@ -230,6 +202,7 @@ public class DeliveryPerson {
         } catch (SQLException e) {
             System.out.println("SQL 쿼리 실행 중 오류가 발생했습니다.");
             e.printStackTrace();
+            return null;
         }
     }
 }
