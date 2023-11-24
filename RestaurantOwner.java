@@ -265,13 +265,42 @@ public class RestaurantOwner {
         }
     }
 
+    public List<String> getRestaurantList() {
+        String sql = "SELECT name FROM Restaurant WHERE owner_id = ?";
+        List<String> restaurantNameList = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                restaurantNameList.add(resultSet.getString("name"));
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL 실행 중 오류가 발생했습니다.");
+            e.printStackTrace();
+        }
+
+        return restaurantNameList;
+    }
+
+    public int printRestaurantList(){
+        List<String> restaurantNameList = getRestaurantList();
+        for(int i = 0; i < restaurantNameList.size(); i++){
+            System.out.println(i + ". " + restaurantNameList.get(i));
+        }
+
+        return restaurantNameList.size();
+    }
+
     public List<String> getMenuList(int restaurantId){
         String sql = "SELECT name FROM Menu WHERE restaurant_id = ?";
         List<String> menuNameList = new ArrayList<>();
         try{
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, restaurantId);
-            ResultSet resultSet  =preparedStatement.executeQuery();
+
+            ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
                 menuNameList.add(resultSet.getString("name"));
             }
@@ -314,11 +343,13 @@ public class RestaurantOwner {
         Scanner scanner = new Scanner(System.in);
         System.out.println("처리할 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
         System.out.println("주문의 새로운 상태를 입력해 주세요:");
         String status = scanner.nextLine();
 
         processOrder(orderId, status);
+
+        ////////////////////////////////////////////////////
     }
 
     public ResultSet getOrderHistory(int restaurantId) {
@@ -382,7 +413,7 @@ public class RestaurantOwner {
         }
     }
 
-    public String getMenuName(int menuId) { ////////////////////////// 중복
+    public String getMenuName(int menuId) { ////////////////////////// 중복 리팩토링 필요
         String sql = "SELECT name  FROM Menu WHERE menu_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
