@@ -82,6 +82,21 @@ public class DeliveryPerson {
         }
     }
 
+    public boolean createOrder(int restaurantId, int menuId) {
+        String sql = "INSERT INTO Orders (restaurant_id, menu_id) VALUES (?, ?)"; // ******** 수정 필요, 배달원과 동기화
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            preparedStatement.setInt(2, menuId);
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public void finishDeliveryService(int userId){
         System.out.println("진행중인 배달 내역입니다.");
         ResultSet resultSet = getDeliveryList(userId, "accepted");
@@ -109,7 +124,7 @@ public class DeliveryPerson {
         scanner.nextLine();
 
         updateDeliveryStatus("finished", deliveryId);
-        updateOrderStatus(orderId, newStatus);
+        updateOrderStatus("finished", orderId);
     }
 
     public ResultSet getDeliveryHistory(int deliveryPersonId) {
@@ -197,6 +212,24 @@ public class DeliveryPerson {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public Integer getOrderIdByDeliveryId(int deliveryId) {
+        String sql = "SELECT order_id FROM Orders WHERE delivery_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, deliveryId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("order_id");
+            }
+            else{
+                return null;
+            }
+        } catch (SQLException e) {
+            System.out.println("SQL 쿼리 실행 중 오류가 발생했습니다.");
+            e.printStackTrace();
         }
     }
 }
