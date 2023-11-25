@@ -251,7 +251,7 @@ public class ServiceProvider {
     }
 
     public void addDeliveryPersonInfo(int userId, String serviceArea) {
-        String sql = "UPDATE User SET service_area = ?, status = 'Free' WHERE user_id = ?";
+        String sql = "UPDATE User SET service_area = ?, status = 'free' WHERE user_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, serviceArea);

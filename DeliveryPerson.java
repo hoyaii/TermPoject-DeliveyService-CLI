@@ -56,7 +56,10 @@ public class DeliveryPerson {
         int deliveryId = scanner.nextInt();
         scanner.nextLine();
 
+        Integer orderId = getOrderIdByDeliveryId(deliveryId);
+
         updateDeliveryStatus("accepted", deliveryId);
+        updateOrderStatus("deliveryMatched", orderId);
         updateUserStatus("notFree");
         System.out.println("요청이 수락되었습니다.");
     }
@@ -102,7 +105,7 @@ public class DeliveryPerson {
 
     public void finishDeliveryService(){
         System.out.println("진행중인 배달 내역입니다.");
-        ResultSet resultSet = getDeliveryList("cooked");
+        ResultSet resultSet = getDeliveryList("accepted");
 
         try {
             if(resultSet.wasNull()){
@@ -130,6 +133,7 @@ public class DeliveryPerson {
 
         updateDeliveryStatus("finished", deliveryId);
         updateOrderStatus("finished", orderId);
+        updateUserStatus("free");
 
         System.out.println("배달 완료 처리가 되었습니다.");
     }
