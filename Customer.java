@@ -240,11 +240,11 @@ public class Customer {
         System.out.println("해당 주문의 배달 상태는 " + deliveryStatus + "입니다!");
     }
 
-    public void writeReview(String restaurantName, int rating, String reviewContent) {
-        String sql = "INSERT INTO Reviews (restaurant_name, rating, content) VALUES (?, ?, ?)";
+    public void writeReview(int orderId, int rating, String reviewContent) {
+        String sql = "INSERT INTO Reviews (order_id, rating, content) VALUES (?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, restaurantName);
+            preparedStatement.setInt(1, orderId);
             preparedStatement.setInt(2, rating);
             preparedStatement.setString(3, reviewContent);
 
@@ -261,15 +261,20 @@ public class Customer {
     }
 
     public void writeReviewService(){
+        ResultSet resultSet = getUserOrders();
+        List<Integer> orderIdList = printOrderHistory(resultSet);
+
         System.out.println("리뷰를 작성할 주문을 입력해 주세요:");
-        String restaurantName = scanner.nextLine();
+        int orderId = scanner.nextInt();
+
         System.out.println("리뷰의 별점을 입력해 주세요:");
         int rating = scanner.nextInt();
         scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+
         System.out.println("리뷰 내용을 입력해 주세요:");
         String reviewContent = scanner.nextLine();
 
-        writeReview(restaurantName, rating, reviewContent);
+        writeReview(orderId, rating, reviewContent);
     }
 
     public ResultSet getUserOrders() {
