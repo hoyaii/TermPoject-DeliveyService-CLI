@@ -193,36 +193,43 @@ public class Customer {
         }
     }
 
-    public void getDeliveryStatusService(){ //////////////////////////// resultSet으로 리팩토링
-        List<Integer> userOrders = getUserOrders();
+    public void getDeliveryStatusService(){
+        ResultSet resultSet = getUserOrders();
+        List<Integer> orderIdList = new ArrayList<>();
 
-        if (userOrders.isEmpty()) {
-            System.out.println("주문이 없습니다.");
-            return;
-        }
+        try {
+            if(resultSet.wasNull()){
+                System.out.println("주문이 없습니다.");
+                return;
+            }
 
-        for (Integer orderId : userOrders) {
-            System.out.println("메뉴명: " + getMenuNamByOrderId(orderId) + ", 주문 ID: " + orderId);
+            while (resultSet.next()) {
+                int orderId = resultSet.getInt("order_id ");
+                String menuName = getMenuNamByOrderId(orderId);
+
+                System.out.println("주문 ID: " + orderId + " 메뉴명: " + menuName);
+
+                orderIdList.add(orderId);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error retrieving delivery history.");
+            e.printStackTrace();
         }
 
         System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
         int orderId = scanner.nextInt();
         scanner.nextLine();
 
-        if (!userOrders.contains(orderId)) {
+        if (!orderIdList.contains(orderId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
             System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
             return;
         }
 
         String deliveryStatus = getDeliveryStatus(orderId);
         String orderTime = getOrderTime(orderId);
-        if (deliveryStatus != null) {
-            System.out.println("배달 상태: " + deliveryStatus);
-            System.out.println("주문 시간: " + orderTime);
 
-        } else {
-            System.out.println("주문 ID가 잘못되었거나, 배달 상태를 확인할 수 없습니다.");
-        }
+        System.out.println("배달 상태: " + deliveryStatus);
+        System.out.println("주문 시간: " + orderTime);
     }
 
     public void writeReview(String restaurantName, int rating, String reviewContent) {
