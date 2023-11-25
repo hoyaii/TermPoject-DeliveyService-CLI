@@ -139,7 +139,7 @@ public class DeliveryPerson {
     }
 
     public ResultSet getDeliveryHistory() {
-        String sql = "SELECT * FROM Orders WHERE delivery_person_id = ?";
+        String sql = "SELECT * FROM Orders WHERE delivery_person_id = ? AND status = 'finished'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);

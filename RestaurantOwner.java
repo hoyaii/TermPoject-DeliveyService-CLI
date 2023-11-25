@@ -436,7 +436,7 @@ public class RestaurantOwner {
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
-            preparedStatement.setInt(2, this.userId);
+            preparedStatement.setInt(2, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("restaurant_id");
