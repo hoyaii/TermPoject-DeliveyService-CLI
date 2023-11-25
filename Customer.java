@@ -193,21 +193,24 @@ public class Customer {
         }
     }
 
-    public void getDeliveryStatusService(){
-        ResultSet resultSet = getUserOrders();
+    public List<Integer> printOrderHistory(ResultSet resultSet){
         List<Integer> orderIdList = new ArrayList<>();
 
         try {
             if(resultSet.wasNull()){
                 System.out.println("주문이 없습니다.");
-                return;
+                return null;
             }
 
             while (resultSet.next()) {
                 int orderId = resultSet.getInt("order_id ");
                 String menuName = getMenuNamByOrderId(orderId);
+                Timestamp orderTime = resultSet.getTimestamp("order_time");
 
-                System.out.println("주문 ID: " + orderId + " 메뉴명: " + menuName);
+                LocalDateTime orderDateTime = orderTime.toLocalDateTime();
+                String formattedOrderTime = orderDateTime.toString();
+
+                System.out.println("주문 ID: " + orderId + " 메뉴명: " + menuName + " 주문 시간: " + formattedOrderTime);
 
                 orderIdList.add(orderId);
             }
@@ -215,6 +218,13 @@ public class Customer {
             System.out.println("Error retrieving delivery history.");
             e.printStackTrace();
         }
+
+        return orderIdList;
+    }
+
+    public void getDeliveryStatusService(){
+        ResultSet resultSet = getUserOrders();
+        List<Integer> orderIdList = printOrderHistory(resultSet);
 
         System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
         int orderId = scanner.nextInt();
@@ -226,10 +236,8 @@ public class Customer {
         }
 
         String deliveryStatus = getDeliveryStatus(orderId);
-        String orderTime = getOrderTime(orderId);
 
-        System.out.println("배달 상태: " + deliveryStatus);
-        System.out.println("주문 시간: " + orderTime);
+        System.out.println("해당 주문의 배달 상태는 " + deliveryStatus + "입니다!");
     }
 
     public void writeReview(String restaurantName, int rating, String reviewContent) {
@@ -253,7 +261,7 @@ public class Customer {
     }
 
     public void writeReviewService(){
-        System.out.println("리뷰를 작성할 음식점의 이름을 입력해 주세요:");
+        System.out.println("리뷰를 작성할 주문을 입력해 주세요:");
         String restaurantName = scanner.nextLine();
         System.out.println("리뷰의 별점을 입력해 주세요:");
         int rating = scanner.nextInt();
@@ -264,7 +272,7 @@ public class Customer {
         writeReview(restaurantName, rating, reviewContent);
     }
 
-    public ResultSet getUserOrders() { //////// refactor
+    public ResultSet getUserOrders() {
         String sql = "SELECT * FROM Orders WHERE customer_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
