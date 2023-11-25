@@ -264,12 +264,17 @@ public class Customer {
         ResultSet resultSet = getUserOrders();
         List<Integer> orderIdList = printOrderHistory(resultSet);
 
-        System.out.println("리뷰를 작성할 주문을 입력해 주세요:");
+        System.out.println("리뷰를 작성할 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
+
+        if (!orderIdList.contains(orderId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
+            System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            return;
+        }
 
         System.out.println("리뷰의 별점을 입력해 주세요:");
         int rating = scanner.nextInt();
-        scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+        scanner.nextLine();
 
         System.out.println("리뷰 내용을 입력해 주세요:");
         String reviewContent = scanner.nextLine();
