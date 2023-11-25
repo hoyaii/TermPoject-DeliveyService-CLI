@@ -55,7 +55,9 @@ public class DeliveryPerson {
         System.out.println("수락하고 싶은 요청의 id를 입력하세요.");
         int deliveryId = scanner.nextInt();
         scanner.nextLine();
+
         updateDeliveryStatus("accepted", deliveryId);
+        updateUserStatus("notFree");
         System.out.println("요청이 수락되었습니다.");
     }
 
@@ -65,6 +67,19 @@ public class DeliveryPerson {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, status);
             preparedStatement.setInt(2, deliveryId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserStatus(String status) {
+        String sql = "UPDATE User SET status = ? WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, status);
+            preparedStatement.setInt(2, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");

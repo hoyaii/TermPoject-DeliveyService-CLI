@@ -18,7 +18,7 @@ public class Customer {
     }
 
     public ResultSet searchRestaurants(String name, String location, String type) {
-        String sql = "SELECT * FROM Restaurant WHERE name LIKE ? AND location LIKE ? AND type LIKE ?";
+        String sql = "SELECT * FROM Restaurant WHERE name LIKE ? AND service_area  LIKE ? AND cuisine_type LIKE ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, "%" + name + "%");
@@ -32,7 +32,7 @@ public class Customer {
         }
     }
 
-    public void searchRestaurantsService(int userId){
+    public void searchRestaurantsService(int userId){ // ********************** 3가지 쿼리 기능 테스트 필요
         System.out.println("검색하실 음식점의 이름을 입력해 주세요:");
         String name = scanner.nextLine();
         System.out.println("검색하실 음식점의 위치를 입력해 주세요:");
@@ -41,11 +41,11 @@ public class Customer {
         String type = scanner.nextLine();
 
         ResultSet resultSet = searchRestaurants(name, location, type);
-        HashSet<Integer> validRestaurantIds = new HashSet<>();
+        HashSet<Integer> restaurantIdList = new HashSet<>();
         try {
             while (resultSet.next()) {
                 int restaurantId = resultSet.getInt("restaurant_id");
-                validRestaurantIds.add(restaurantId);
+                restaurantIdList.add(restaurantId);
                 System.out.println("음식점 ID: " + resultSet.getInt("restaurant_id"));
                 System.out.println("이름: " + resultSet.getString("name"));
                 System.out.println("위치: " + resultSet.getString("location"));
@@ -61,7 +61,7 @@ public class Customer {
         int restaurantId = scanner.nextInt();
         scanner.nextLine();
 
-        if (validRestaurantIds.contains(restaurantId)) {
+        if (restaurantIdList.contains(restaurantId)) {
             orderService(restaurantId);
         } else {
             System.out.println("유효하지 않은 음식점 ID입니다.");
@@ -71,7 +71,7 @@ public class Customer {
     public boolean requestDelivery(int restaurantId, String address){
         String serviceArea = getServiceArea(restaurantId);
 
-        List<Integer> availableDeliveryPersons =  getAvailableDeliveryPeople(serviceArea);
+        List<Integer> availableDeliveryPersons = getAvailableDeliveryPeople(serviceArea);
 
         if(availableDeliveryPersons.isEmpty()){
             System.out.println("배달 가능한 배달원이 존재하지 않습니다.");
@@ -141,6 +141,7 @@ public class Customer {
 
     public void orderService(int restaurantId){
         ResultSet menuResultSet = getMenu(restaurantId);
+
         try {
             while (menuResultSet.next()) {
                 System.out.println("메뉴 ID: " + menuResultSet.getInt("menu_id"));
@@ -337,7 +338,7 @@ public class Customer {
 
     public List<Integer> getAvailableDeliveryPeople(String serviceArea) {
         List<Integer> availableDeliveryPersons = new ArrayList<>();
-        String sql = "SELECT delivery_person_id FROM DeliveryPerson WHERE service_area = ? AND status = 'Free'";
+        String sql = "SELECT user_id FROM User WHERE service_area = ? AND status = 'Free'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, serviceArea);

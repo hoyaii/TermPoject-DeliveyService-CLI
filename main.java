@@ -13,7 +13,7 @@ class Main {
             System.out.println("2. 회원 가입");
 
             int option = scanner.nextInt();
-            scanner.nextLine();  // nextInt 후에 남은 개행문자 처리
+            scanner.nextLine();
 
             if (option == 1) {
                 // 로그인 진행
@@ -64,14 +64,10 @@ class Main {
                 break;
 
             case 2:
-                // customer.menuService();
-                break;
-
-            case 3:
                 customer.getDeliveryStatusService();
                 break;
 
-            case 4:
+            case 3:
                 customer.writeReviewService();
                 break;
 

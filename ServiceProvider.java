@@ -143,7 +143,7 @@ public class ServiceProvider {
             System.out.println("배달 지역을 입력해 주세요:");
             String serviceArea = scanner.nextLine();
 
-            addServiceArea(userId, serviceArea);
+            addDeliveryPersonInfo(userId, serviceArea);
         }
     }
 
@@ -250,8 +250,8 @@ public class ServiceProvider {
         }
     }
 
-    public void addServiceArea(int userId, String serviceArea) {
-        String sql = "UPDATE User SET service_area = ? WHERE user_id = ?";
+    public void addDeliveryPersonInfo(int userId, String serviceArea) {
+        String sql = "UPDATE User SET service_area = ?, status = 'Free' WHERE user_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, serviceArea);
