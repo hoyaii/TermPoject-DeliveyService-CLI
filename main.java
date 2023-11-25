@@ -50,10 +50,9 @@ class Main {
         Customer customer = new Customer(db, userId);
 
         System.out.println("고객님, 환영합니다! 아래 옵션 중 선택해 주세요:");
-        System.out.println("1. 음식점 검색");
-        //System.out.println("2. 메뉴 선택 및 주문");
-        System.out.println("3. 배달 상태 확인");
-        System.out.println("4. 리뷰 작성");
+        System.out.println("1. 음식점 검색과 주문");
+        System.out.println("2. 배달 상태 확인");
+        System.out.println("3. 리뷰 작성");
 
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();

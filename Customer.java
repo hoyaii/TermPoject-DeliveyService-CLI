@@ -193,7 +193,7 @@ public class Customer {
         }
     }
 
-    public void getDeliveryStatusService(){
+    public void getDeliveryStatusService(){ //////////////////////////// resultSet으로 리팩토링
         List<Integer> userOrders = getUserOrders();
 
         if (userOrders.isEmpty()) {
@@ -257,22 +257,17 @@ public class Customer {
         writeReview(restaurantName, rating, reviewContent);
     }
 
-    public List<Integer> getUserOrders() {
-        String sql = "SELECT order_id FROM Orders WHERE customer_id = ?";
-        List<Integer> orderIds = new ArrayList<>();
+    public ResultSet getUserOrders() { //////// refactor
+        String sql = "SELECT * FROM Orders WHERE customer_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while(resultSet.next()) {
-                orderIds.add(resultSet.getInt("order_id"));
-            }
+            return preparedStatement.executeQuery();
         } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
             e.printStackTrace();
+            return null;
         }
-
-        return orderIds;
     }
 
     public String getMenuNamByOrderId(int orderId) {

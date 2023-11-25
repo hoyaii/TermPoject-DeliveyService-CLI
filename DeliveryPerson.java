@@ -73,7 +73,7 @@ public class DeliveryPerson {
     }
 
     public void updateOrderStatus(String status, int orderId) {
-        String sql = "UPDATE `Order` SET status = ? WHERE order_id = ?";
+        String sql = "UPDATE Orders SET status = ? WHERE order_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, status);
@@ -87,7 +87,7 @@ public class DeliveryPerson {
 
     public void finishDeliveryService(){
         System.out.println("진행중인 배달 내역입니다.");
-        ResultSet resultSet = getDeliveryList("accepted");
+        ResultSet resultSet = getDeliveryList("cooked");
 
         try {
             if(resultSet.wasNull()){

@@ -361,7 +361,6 @@ public class RestaurantOwner {
         ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
         printOrderSet(orderSet); // order 정보들 출력
 
-        Scanner scanner = new Scanner(System.in);
         System.out.println("처리할 주문의 ID를 입력해 주세요:");
         int orderId = scanner.nextInt();
         scanner.nextLine();
@@ -382,7 +381,6 @@ public class RestaurantOwner {
         }
     }
 
-
     public ResultSet getOrderHistory(int restaurantId) {
         String sql = "SELECT * FROM Orders WHERE menu_id IN (SELECT menu_id FROM Menu WHERE restaurant_id = ?)";
         try {
@@ -394,18 +392,6 @@ public class RestaurantOwner {
             e.printStackTrace();
             return null;
         }
-    }
-
-    public void getOrderHistoryService(){
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
-            return;
-        }
-        System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
-
-        ResultSet orderHistory = getOrderHistory(restaurantId);
-        printOrderSet(orderHistory);
     }
 
     public void printOrderSet(ResultSet orderSet){
@@ -431,6 +417,18 @@ public class RestaurantOwner {
             System.out.println("Error retrieving order history.");
             e.printStackTrace();
         }
+    }
+
+    public void getOrderHistoryService(){
+        if(!printRestaurantList(getRestaurantList())){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+        System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
+
+        ResultSet orderHistory = getOrderHistory(restaurantId);
+        printOrderSet(orderHistory);
     }
 
     public Integer getRestaurantIdByName(String name) {
