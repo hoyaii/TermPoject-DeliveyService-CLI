@@ -87,7 +87,8 @@ public class DeliveryPerson {
 
                 String menuName = getMenuName(menuId);
                 String restaurantName = getRestaurantName(restaurantId);
-                System.out.println("주문 ID: " + orderId + ", 가게 이름: " + restaurantName + "메뉴 이름: " + menuName + "주문 시간: " + formattedOrderTime);
+                String deliveryAddress = getDeliveryAddress(orderId);
+                System.out.println("주문 ID: " + orderId + " 가게 이름: " + restaurantName + " 메뉴 이름: " + menuName + " 주문 시간: " + formattedOrderTime + " 배달 주소: " + deliveryAddress);
             }
         } catch (SQLException e) {
             handleSQLException(e);
@@ -105,6 +106,31 @@ public class DeliveryPerson {
             handleSQLException(e);
             return null;
         }
+    }
+
+    public List<Integer> printDeliveryList(ResultSet resultSet){
+        List<Integer> deliveryIdList = new ArrayList<>();
+        try {
+            if(resultSet.wasNull()){
+                System.out.println("배달 내역이 없습니다.");
+                return null;
+            }
+
+            while (resultSet.next()) {
+                int deliveryId = resultSet.getInt("delivery_id ");
+                int restaurantId = resultSet.getInt("restaurant_id");
+                String deliveryAddress = resultSet.getString("delivery_address");
+                String restaurantAddress = getRestaurantAddress(restaurantId);
+                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
+
+                deliveryIdList.add(deliveryId);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+
+        return deliveryIdList;
     }
 
     public void updateDeliveryStatus(String status, int deliveryId) {
@@ -142,31 +168,6 @@ public class DeliveryPerson {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
         }
-    }
-
-    public List<Integer> printDeliveryList(ResultSet resultSet){
-        List<Integer> deliveryIdList = new ArrayList<>();
-        try {
-            if(resultSet.wasNull()){
-                System.out.println("배달 내역이 없습니다.");
-                return null;
-            }
-
-            while (resultSet.next()) {
-                int deliveryId = resultSet.getInt("delivery_id ");
-                int restaurantId = resultSet.getInt("restaurant_id");
-                String deliveryAddress = resultSet.getString("delivery_address");
-                String restaurantAddress = getRestaurantAddress(restaurantId);
-                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
-
-                deliveryIdList.add(deliveryId);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
-        }
-
-        return deliveryIdList;
     }
 
     public ResultSet getDeliveryHistory() {
@@ -242,6 +243,24 @@ public class DeliveryPerson {
 
             if (resultSet.next()) {
                 return resultSet.getString("name");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
+    public String getDeliveryAddress(int orderId) {
+        String sql = "SELECT delivery_address FROM Delivery WHERE delivery_id = (SELECT delivery_id FROM Orders WHERE order_id = ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("delivery_address");
             } else {
                 return null;
             }
