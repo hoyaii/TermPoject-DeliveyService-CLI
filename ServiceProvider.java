@@ -124,7 +124,12 @@ public class ServiceProvider {
             do {
                 System.out.println("배달 지역을 입력해 주세요:");
                 serviceArea = scanner.nextLine();
-            } while (serviceArea == null || serviceArea.isEmpty());
+
+                if (!serviceArea.equals("서울") && !serviceArea.equals("부산") && !serviceArea.equals("대구") && !serviceArea.equals("대전") && !serviceArea.equals("광주") && !serviceArea.equals("울산")) {
+                    System.out.println("배달 서비스는 '서울', '부산', '대구', '대전', '광주', '울산'에서만 제공합니다. 다시 작성해주세요.");
+                    serviceArea = null;
+                }
+            } while (serviceArea == null);
 
             addDeliveryPersonInfo(userId, serviceArea);
         }
