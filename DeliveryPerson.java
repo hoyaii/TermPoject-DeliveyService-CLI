@@ -18,7 +18,7 @@ public class DeliveryPerson {
         this.userId = userId;
     }
 
-    public void getDeliveryRequestService(){ //  배달원이 요청 리스트를 보고 승낙하여 매칭
+    public void manageDeliveryRequestService(){ //  배달원이 요청 리스트를 보고 승낙하여 매칭
         ResultSet resultSet = getDeliveryList("notAccepted");
 
         List<Integer> deliveryIdList = printDeliveryList(resultSet);
@@ -74,9 +74,19 @@ public class DeliveryPerson {
         System.out.println("배달 완료 처리가 되었습니다.");
     }
 
-    public void getDeliveryHistoryService(){
+    public void printDeliveryHistoryService(){
+        int deliveryCount = getDeliveryCountByUserId(userId);
+
+        System.out.println("지금까지 " + deliveryCount + " 번 배달을 완료하셨습니다!");
+
         ResultSet resultSet = getDeliveryHistory();
+
         try {
+            if(resultSet.wasNull()){
+                System.out.println("배달 이력이 없습니다.");
+                return;
+            }
+
             while (resultSet.next()) {
                 int orderId = resultSet.getInt("order_id");
                 int menuId = resultSet.getInt("menu_id");
@@ -268,6 +278,22 @@ public class DeliveryPerson {
             handleSQLException(e);
             return null;
         }
+    }
+
+    public int getDeliveryCountByUserId(int userId){
+        try {
+            String query = "SELECT COUNT(*) AS count FROM Delivery WHERE delivery_person_id = ?";
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if(resultSet.next()){
+                return resultSet.getInt("count");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;  // SQL 오류가 발생하거나, 해당하는 레코드가 없는 경우
     }
 
     private void handleSQLException(SQLException e) {

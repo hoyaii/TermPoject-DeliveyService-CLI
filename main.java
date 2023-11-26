@@ -136,7 +136,7 @@ class Main {
 
         switch (option) {
             case 1:
-                deliveryPerson.getDeliveryRequestService();
+                deliveryPerson.manageDeliveryRequestService();
                 break;
 
             case 2:
@@ -144,7 +144,7 @@ class Main {
                 break;
 
             case 3:
-                deliveryPerson.getDeliveryHistoryService();
+                deliveryPerson.printDeliveryHistoryService();
                 break;
 
             default:
