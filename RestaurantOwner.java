@@ -56,36 +56,43 @@ public class RestaurantOwner {
     }
 
     public void updateRestaurantInfoService(){
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
+        ResultSet resultSet = getRestaurantList();
+        List<Integer> restaurantIdList = printRestaurantList(resultSet);
+
+        if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
             return;
         }
 
         System.out.println("정보를 업데이트할 음식점의 id를 입력해 주세요:");
         Integer restaurantId = scanner.nextInt();
 
-        System.out.println("업데이트할 음식점의 이름을 입력해 주세요:");
+        if(!restaurantIdList.contains(restaurantId)){
+            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            return;
+        }
+
+        System.out.println("음식점의 새로운 이름을 입력해 주세요:");
         String newName = scanner.nextLine();
         while(newName == null || newName.isEmpty()){
             System.out.println("아무것도 입력하지 않으셨습니다.");
             newName = scanner.nextLine();
         }
 
-        System.out.println("업데이트할 음식점의 위치를 입력해 주세요:");
+        System.out.println("음식점의 새로운 위치를 입력해 주세요:");
         String newAddress = scanner.nextLine();
         while(newAddress == null || newAddress.isEmpty()){
             System.out.println("아무것도 입력하지 않으셨습니다.");
             newAddress = scanner.nextLine();
         }
 
-        System.out.println("업데이트할 음식점의 카테고리를 입력해 주세요:");
+        System.out.println("음식점의 새로운 카테고리를 입력해 주세요:");
         String newCuisineType = scanner.nextLine();
         while(newCuisineType == null || newCuisineType.isEmpty()){
             System.out.println("아무것도 입력하지 않으셨습니다.");
             newCuisineType = scanner.nextLine();
         }
 
-        System.out.println("업데이트할 음식점의 서비스 지역을 입력해 주세요:");
+        System.out.println("음식점의 새로운 서비스 지역을 입력해 주세요:");
         String newServiceArea = scanner.nextLine();
         while(newServiceArea == null || newServiceArea.isEmpty()){
             System.out.println("아무것도 입력하지 않으셨습니다.");
