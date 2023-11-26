@@ -19,24 +19,6 @@ public class ServiceProvider {
         this.scanner = new Scanner(System.in);
     }
 
-    public boolean login(String email, String password) {
-        String sql = "SELECT user_id FROM User WHERE email = ? AND password = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, email);
-            preparedStatement.setString(2, password);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return false;
-        }
-    }
-
     public String loginService(){
         String email;
         do {
@@ -71,22 +53,6 @@ public class ServiceProvider {
 
         System.out.println("로그인 성공하였습니다!");
         return email;
-    }
-
-    public void registerUser(String email, String username, String password, String role, String phoneNumber, String address) {
-        String sql = "INSERT INTO User (email, username, password, role, phone_number, address) VALUES (?, ?, ?, ?, ?, ?)";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, email);
-            preparedStatement.setString(2, username);
-            preparedStatement.setString(3, password);
-            preparedStatement.setString(4, role);
-            preparedStatement.setString(5, phoneNumber);
-            preparedStatement.setString(6, address);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e);
-        }
     }
 
     public void registerUserService(){
@@ -164,23 +130,23 @@ public class ServiceProvider {
         }
     }
 
-    public void updateUser(int userId, String username, String password, String role) { // email은 unique해야 해서 수정이 불가능하다
-        String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, role);
-            preparedStatement.setInt(4, userId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e);
-        }
-    }
-
     public void updateUserService(){
-        System.out.println("수정할 유저의 이메일을 입력해 주세요:");
-        String email = scanner.nextLine();
+        String email;
+        do {
+            System.out.println("수정할 유저의 이메일을 입력해 주세요:");
+            email = scanner.nextLine();
+
+            if (!isValidEmail(email)) {
+                System.out.println("이메일 형식이 올바르지 않습니다.");
+                email = null;
+            }
+
+            if (getUserIdByEmail(email) == 0) {
+                System.out.println("가입되지 않은 계정입니다. 회원가입 후 다시 시도해주세요.");
+                email = null;
+            }
+
+        } while (email == null);
 
         int userId = getUserIdByEmail(email);
 
@@ -215,6 +181,77 @@ public class ServiceProvider {
         updateUser(userId, newName, newPassword, newRole);
     }
 
+    public void deleteUserService(){
+        String email;
+        do {
+            System.out.println("삭제할 유저의 이메일을 입력해 주세요:");
+            email = scanner.nextLine();
+
+            if (!isValidEmail(email)) {
+                System.out.println("이메일 형식이 올바르지 않습니다.");
+                email = null;
+            }
+
+            if (getUserIdByEmail(email) == 0) {
+                System.out.println("가입되지 않은 계정입니다. 회원가입 후 다시 시도해주세요.");
+                email = null;
+            }
+
+        } while (email == null);
+
+        int userId = getUserIdByEmail(email);
+
+        deleteUser(userId);
+    }
+
+    public boolean login(String email, String password) {
+        String sql = "SELECT user_id FROM User WHERE email = ? AND password = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, password);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return false;
+        }
+    }
+
+    public void registerUser(String email, String username, String password, String role, String phoneNumber, String address) {
+        String sql = "INSERT INTO User (email, username, password, role, phone_number, address) VALUES (?, ?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, email);
+            preparedStatement.setString(2, username);
+            preparedStatement.setString(3, password);
+            preparedStatement.setString(4, role);
+            preparedStatement.setString(5, phoneNumber);
+            preparedStatement.setString(6, address);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public void updateUser(int userId, String username, String password, String role) { // email은 unique해야 해서 수정이 불가능하다
+        String sql = "UPDATE User SET username = ?, password = ?, role = ? WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, password);
+            preparedStatement.setString(3, role);
+            preparedStatement.setInt(4, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
     public void deleteUser(int userId) {
         String sql = "DELETE FROM User WHERE user_id = ?";
         try {
@@ -224,15 +261,6 @@ public class ServiceProvider {
         } catch (SQLException e) {
             handleSQLException(e);
         }
-    }
-
-    public void deleteUserService(){
-        System.out.println("삭제할 유저의 이메일을 입력해 주세요:");
-        String email = scanner.nextLine();
-
-        int userId = getUserIdByEmail(email);
-
-        deleteUser(userId);
     }
 
     public int getUserIdByEmail(String email) {
