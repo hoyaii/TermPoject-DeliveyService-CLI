@@ -8,7 +8,7 @@ class Main {
         ServiceProvider serviceProvider = new ServiceProvider(db);
 
         while (true) {
-            System.out.println("서비스에 오신 것을 환영합니다! 아래 옵션 중 선택해 주세요:");
+            System.out.println("CLI의 민족에 오신 것을 환영합니다! 아래 옵션 중 선택해 주세요:");
             System.out.println("1. 로그인");
             System.out.println("2. 회원 가입");
 
@@ -23,27 +23,29 @@ class Main {
                 String role = serviceProvider.getRoleByEmail(email);
 
                 // 기능 선택
+                Runnable handler = null;
+
                 if (role.equals("Customer")) {
-                    handleCustomer(db, userId);
-                    break;
+                    handler = () -> handleCustomer(db, userId);
                 } else if (role.equals("RestaurantOwner")) {
-                    handleRestaurantOwner(db, userId);
-                    break;
+                    handler = () -> handleRestaurantOwner(db, userId);
                 } else if (role.equals("DeliveryPerson")) {
-                    handleDeliveryPerson(db, userId);
-                    break;
+                    handler = () -> handleDeliveryPerson(db, userId);
                 } else if (role.equals("ServiceProvider")){
-                    handleServiceProvider(db);
-                    break;
+                    handler = () -> handleServiceProvider(db);
+                }
+
+                // 선택된 핸들러로 계속 처리, 기능 이용을 마치면 다른 기능을 또 이용하도록
+                if (handler != null) {
+                    while(true) {
+                        handler.run();
+                    }
                 }
             } else if (option == 2) {
                 // 회원 가입 진행
                 serviceProvider.registerUserService();
             }
         }
-
-        db.close();
-        scanner.close();
     }
 
     public static void handleCustomer(Database db, int userId) {

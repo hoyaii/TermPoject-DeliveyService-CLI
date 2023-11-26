@@ -28,6 +28,7 @@ public class ServiceProvider {
             if (!isValidEmail(email)) {
                 System.out.println("이메일 형식이 올바르지 않습니다.");
                 email = null;
+                continue;
             }
             if (getUserIdByEmail(email) == 0) {
                 System.out.println("가입되지 않은 계정입니다. 회원가입 후 다시 시도해주세요.");
@@ -44,6 +45,7 @@ public class ServiceProvider {
             if (!isValidPassword(password)) {
                 System.out.println("비밀번호 형식이 올바르지 않습니다.");
                 password = null;
+                continue;
             }
             if(!login(email, password)){
                 System.out.println("비밀번호가 잘못되었습니다. 다시 시도해주세요.");
@@ -64,6 +66,7 @@ public class ServiceProvider {
             if (!isValidEmail(email)) {
                 System.out.println("올바른 이메일 형식을 입력해주세요.");
                 email = null;
+                continue;
             }
 
             if (getUserIdByEmail(email) != 0) { // 이메일 중복 확인
@@ -144,6 +147,7 @@ public class ServiceProvider {
             if (!isValidEmail(email)) {
                 System.out.println("이메일 형식이 올바르지 않습니다.");
                 email = null;
+                continue;
             }
 
             if (getUserIdByEmail(email) == 0) {
@@ -195,6 +199,7 @@ public class ServiceProvider {
             if (!isValidEmail(email)) {
                 System.out.println("이메일 형식이 올바르지 않습니다.");
                 email = null;
+                continue;
             }
 
             if (getUserIdByEmail(email) == 0) {
