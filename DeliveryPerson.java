@@ -82,7 +82,7 @@ public class DeliveryPerson {
         ResultSet resultSet = getDeliveryHistory();
 
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("배달 이력이 없습니다.");
                 return;
             }
@@ -121,7 +121,7 @@ public class DeliveryPerson {
     public List<Integer> printDeliveryList(ResultSet resultSet){
         List<Integer> deliveryIdList = new ArrayList<>();
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("배달 내역이 없습니다.");
                 return null;
             }

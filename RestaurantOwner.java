@@ -359,7 +359,7 @@ public class RestaurantOwner {
     public List<Integer> printRestaurantList(ResultSet resultSet){
         List<Integer> restaurantIdList = new ArrayList<>();
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("관리하고 있는 식당이 없습니다.");
                 return null;
             }
@@ -450,7 +450,7 @@ public class RestaurantOwner {
     public List<Integer> printOrderSet(ResultSet resultSet){
         List<Integer> orderIdList = new ArrayList<>();
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("처리할 주문이 없습니다.");
                 return null;
             }

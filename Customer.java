@@ -182,7 +182,7 @@ public class Customer {
     public List<Integer> printRestaurantList(ResultSet resultSet){
         List<Integer> restaurantIdList = new ArrayList<>();
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("해당 음식점은 존재하지 않습니다.");
                 return null;
             }
@@ -256,7 +256,7 @@ public class Customer {
     public List<Integer> printMenuList(ResultSet resultSet){
         List<Integer> menuIdList = new ArrayList<>();
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("메뉴가 없습니다.");
                 return null;
             }
@@ -298,7 +298,7 @@ public class Customer {
         List<Integer> orderIdList = new ArrayList<>();
 
         try {
-            if(resultSet.wasNull()){
+            if(resultSet == null){
                 System.out.println("주문이 없습니다.");
                 return null;
             }
