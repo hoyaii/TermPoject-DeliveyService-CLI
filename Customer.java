@@ -54,7 +54,7 @@ public class Customer {
 
         orderService(restaurantId);
     }
-    
+
     public List<Integer> printRestaurantList(ResultSet resultSet){
         List<Integer> restaurantIdList = new ArrayList<>();
         try {
@@ -282,12 +282,25 @@ public class Customer {
             return;
         }
 
-        System.out.println("리뷰의 별점을 입력해 주세요:");
-        int rating = scanner.nextInt();
+        int rating;
+        do {
+            System.out.println("리뷰의 별점을 입력해 주세요 (1~5):");
+            rating = scanner.nextInt();
+            if (rating < 1 || rating > 5) {
+                System.out.println("잘못 입력하셨습니다. 별점은 1~5 사이의 숫자로 입력해 주세요.");
+            }
+        } while (rating < 1 || rating > 5);
+
         scanner.nextLine();
 
-        System.out.println("리뷰 내용을 입력해 주세요:");
-        String reviewContent = scanner.nextLine();
+        String reviewContent;
+        do {
+            System.out.println("리뷰 내용을 입력해 주세요:");
+            reviewContent = scanner.nextLine();
+            if (reviewContent.trim().isEmpty()) {
+                System.out.println("리뷰 내용이 입력되지 않았습니다. 리뷰 내용을 입력해주세요.");
+            }
+        } while (reviewContent.trim().isEmpty());
 
         writeReview(orderId, rating, reviewContent);
     }
