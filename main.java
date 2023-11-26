@@ -109,7 +109,7 @@ class Main {
                 break;
 
             case 4:
-                restaurantOwner.finishCookedService();
+                restaurantOwner.finishCookingService();
                 break;
 
             case 5:

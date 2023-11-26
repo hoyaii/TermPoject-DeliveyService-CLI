@@ -18,23 +18,6 @@ public class RestaurantOwner {
         this.userId = userId;
     }
 
-    public boolean registerRestaurant(String name, String address, String cuisineType, String serviceArea) {
-        String sql = "INSERT INTO Restaurant (name, address, cuisine_type, owner_id, service_area) VALUES (?, ?, ?, ?, ?)";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, address);
-            preparedStatement.setString(3, cuisineType);
-            preparedStatement.setInt(4, userId);
-            preparedStatement.setString(5, serviceArea);
-            int affectedRows = preparedStatement.executeUpdate();
-            return affectedRows > 0;
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return false;
-        }
-    }
-
     public void registerRestaurantService(){
         System.out.println("등록할 음식점의 이름을 입력해 주세요:");
         String name = scanner.nextLine();
@@ -69,24 +52,6 @@ public class RestaurantOwner {
             System.out.println("음식점 정보가 성공적으로 등록되었습니다.");
         } else {
             System.out.println("음식점 정보 등록에 실패하였습니다.");
-        }
-    }
-
-    public boolean updateRestaurantInfo(int restaurantId, String name, String address, String cuisineType, String serviceArea) {
-        String sql = "UPDATE Restaurant SET name = ?, address = ?, cuisine_type = ?, service_area = ? WHERE restaurant_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setString(2, address);
-            preparedStatement.setString(3, cuisineType);
-            preparedStatement.setString(4, serviceArea);
-            preparedStatement.setInt(5, restaurantId);
-
-            int affectedRows = preparedStatement.executeUpdate();
-            return affectedRows > 0;
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return false;
         }
     }
 
@@ -132,43 +97,6 @@ public class RestaurantOwner {
             System.out.println("음식점 정보가 성공적으로 업데이트되었습니다.");
         } else {
             System.out.println("음식점 정보 업데이트에 실패하였습니다.");
-        }
-    }
-
-    public void registerMenu(int restaurantId, String name, double price) { // 메뉴 및 가격 등록
-        String sql = "INSERT INTO Menu (name, price, restaurant_id) VALUES (?, ?, ?)";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setDouble(2, price);
-            preparedStatement.setInt(3, restaurantId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e);
-        }
-    }
-
-    public void updateMenu(int menuId, String name, double price) { // 메뉴 및 가격 업데이트
-        String sql = "UPDATE Menu SET name = ?, price = ? WHERE menu_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setDouble(2, price);
-            preparedStatement.setInt(3, menuId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e);
-        }
-    }
-
-    public void deleteMenu(int menuId) {
-        String sql = "DELETE FROM Menu WHERE menu_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, menuId);
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e);
         }
     }
 
@@ -264,6 +192,109 @@ public class RestaurantOwner {
         }
     }
 
+    public void finishCookingService() {
+        if(!printRestaurantList(getRestaurantList())){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+
+        System.out.println("주문을 처리할 식당의 id를 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
+
+        ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
+        printOrderSet(orderSet); // order 정보들 출력
+
+        System.out.println("처리할 주문의 ID를 입력해 주세요:");
+        int orderId = scanner.nextInt();
+        scanner.nextLine();
+
+        updateOrderStatus(orderId, "cooked");
+    }
+
+    public void getOrderHistoryService(){
+        if(!printRestaurantList(getRestaurantList())){
+            System.out.println("관리하고 있는 식당이 없습니다.");
+            return;
+        }
+        System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
+        Integer restaurantId = scanner.nextInt();
+
+        ResultSet orderHistory = getOrderHistory(restaurantId);
+        printOrderSet(orderHistory);
+    }
+
+    public boolean registerRestaurant(String name, String address, String cuisineType, String serviceArea) {
+        String sql = "INSERT INTO Restaurant (name, address, cuisine_type, owner_id, service_area) VALUES (?, ?, ?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, address);
+            preparedStatement.setString(3, cuisineType);
+            preparedStatement.setInt(4, userId);
+            preparedStatement.setString(5, serviceArea);
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return false;
+        }
+    }
+
+    public boolean updateRestaurantInfo(int restaurantId, String name, String address, String cuisineType, String serviceArea) {
+        String sql = "UPDATE Restaurant SET name = ?, address = ?, cuisine_type = ?, service_area = ? WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, address);
+            preparedStatement.setString(3, cuisineType);
+            preparedStatement.setString(4, serviceArea);
+            preparedStatement.setInt(5, restaurantId);
+
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return false;
+        }
+    }
+
+    public void registerMenu(int restaurantId, String name, double price) { // 메뉴 및 가격 등록
+        String sql = "INSERT INTO Menu (name, price, restaurant_id) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setDouble(2, price);
+            preparedStatement.setInt(3, restaurantId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public void updateMenu(int menuId, String name, double price) { // 메뉴 및 가격 업데이트
+        String sql = "UPDATE Menu SET name = ?, price = ? WHERE menu_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setDouble(2, price);
+            preparedStatement.setInt(3, menuId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public void deleteMenu(int menuId) {
+        String sql = "DELETE FROM Menu WHERE menu_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, menuId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
     public ResultSet getRestaurantList() {
         String sql = "SELECT name FROM Restaurant WHERE owner_id = ?";
         try {
@@ -276,24 +307,27 @@ public class RestaurantOwner {
         }
     }
 
-    public boolean printRestaurantList(ResultSet restaurantSet){
+    public List<Integer> printRestaurantList(ResultSet resultSet){
+        List<Integer> restaurantIdList = new ArrayList<>();
         try {
-            if(restaurantSet.wasNull()){
-                return false;
+            if(resultSet.wasNull()){
+                System.out.println("관리하고 있는 식당이 없습니다.");
+                return null;
             }
 
-            while (restaurantSet.next()) {
-                int restaurantId = restaurantSet.getInt("restaurant_id");
-                String name = restaurantSet.getString("name");
+            while (resultSet.next()) {
+                int restaurantId = resultSet.getInt("restaurant_id");
+                String name = resultSet.getString("name");
 
                 System.out.println("식당 ID: " + restaurantId + " 식당 이름: "+ name);
-            }
 
-            return true;
+                restaurantIdList.add(restaurantId);
+            }
         } catch (SQLException e) {
             handleSQLException(e);
-            return false;
         }
+
+        return restaurantIdList;
     }
 
     public List<String> getMenuList(int restaurantId){
@@ -338,25 +372,6 @@ public class RestaurantOwner {
         } catch (SQLException e) {
             handleSQLException(e);
         }
-    }
-
-    public void finishCookedService() {
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
-            return;
-        }
-
-        System.out.println("주문을 처리할 식당의 id를 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
-
-        ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
-        printOrderSet(orderSet); // order 정보들 출력
-
-        System.out.println("처리할 주문의 ID를 입력해 주세요:");
-        int orderId = scanner.nextInt();
-        scanner.nextLine();
-
-        updateOrderStatus(orderId, "cooked");
     }
 
     public ResultSet getOrdersByRestaurantId(int restaurantId) { // deliveryMatched 상태의 Order들을 얻는다
@@ -404,36 +419,6 @@ public class RestaurantOwner {
             }
         } catch (SQLException e) {
             handleSQLException(e);
-        }
-    }
-
-    public void getOrderHistoryService(){
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
-            return;
-        }
-        System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
-
-        ResultSet orderHistory = getOrderHistory(restaurantId);
-        printOrderSet(orderHistory);
-    }
-
-    public Integer getRestaurantIdByName(String name) {
-        String sql = "SELECT restaurant_id FROM Restaurant WHERE name = ? AND owner_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, name);
-            preparedStatement.setInt(2, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("restaurant_id");
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return null;
         }
     }
 
