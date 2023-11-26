@@ -193,7 +193,7 @@ public class Customer {
                 String location = resultSet.getString("location");
                 String type = resultSet.getString("type");
 
-                System.out.println("음식점 ID: " + restaurantId + " 이름: " + name + " 위치: " + location + " 음식 종류: " + type);
+                System.out.println("음식점 ID: " + restaurantId + ", 이름: " + name + ", 위치: " + location + ", 음식 종류: " + type);
 
                 restaurantIdList.add(restaurantId);
             }
@@ -266,7 +266,7 @@ public class Customer {
                 String name = resultSet.getString("name");
                 double price = resultSet.getDouble("price");
 
-                System.out.println("메뉴 ID: " + menuId + " 메뉴 이름: " + name + " 가격: " + price);
+                System.out.println("메뉴 ID: " + menuId + ", 메뉴 이름: " + name + ", 가격: " + price);
 
                 menuIdList.add(menuId);
             }
@@ -311,7 +311,7 @@ public class Customer {
                 LocalDateTime orderDateTime = orderTime.toLocalDateTime();
                 String formattedOrderTime = orderDateTime.toString();
 
-                System.out.println("주문 ID: " + orderId + " 메뉴명: " + menuName + " 주문 시간: " + formattedOrderTime);
+                System.out.println("주문 ID: " + orderId + ", 메뉴명: " + menuName + ", 주문 시간: " + formattedOrderTime);
 
                 orderIdList.add(orderId);
             }

@@ -74,35 +74,39 @@ public class DeliveryPerson {
         System.out.println("배달 완료 처리가 되었습니다.");
     }
 
-    public void printDeliveryHistoryService(){
-        int deliveryCount = getDeliveryCountByUserId(userId);
-
-        System.out.println("지금까지 " + deliveryCount + " 번 배달을 완료하셨습니다!");
-
-        ResultSet resultSet = getDeliveryHistory();
-
+    public void printDeliveryHistoryService() {
         try {
-            if(resultSet == null){
-                System.out.println("배달 이력이 없습니다.");
-                return;
-            }
+            List<Integer> deliveryIdList = getDeliveryIdList();
 
-            while (resultSet.next()) {
-                int orderId = resultSet.getInt("order_id");
-                int menuId = resultSet.getInt("menu_id");
-                int restaurantId = resultSet.getInt("restaurant_id");
-                Timestamp orderTime = resultSet.getTimestamp("order_time");
-                LocalDateTime orderDateTime = orderTime.toLocalDateTime();
-                String formattedOrderTime = orderDateTime.toString();
+            System.out.println("지금까지 " + deliveryIdList.size() + " 번 배달을 완료하셨습니다!");
 
-                String menuName = getMenuName(menuId);
-                String restaurantName = getRestaurantName(restaurantId);
-                String deliveryAddress = getDeliveryAddress(orderId);
-                System.out.println("주문 ID: " + orderId + " 가게 이름: " + restaurantName + " 메뉴 이름: " + menuName + " 주문 시간: " + formattedOrderTime + " 배달 주소: " + deliveryAddress);
+            for (int deliveryId : deliveryIdList) {
+                printSingleDeliveryHistory(deliveryId);
             }
         } catch (SQLException e) {
             handleSQLException(e);
         }
+    }
+
+    public void printSingleDeliveryHistory(int deliveryId) throws SQLException {
+        ResultSet resultSet = getDeliveryHistory(deliveryId);
+
+        if (resultSet == null) {
+            System.out.println("배달 이력이 없습니다.");
+            return;
+        }
+
+        int orderId = resultSet.getInt("order_id");
+        int menuId = resultSet.getInt("menu_id");
+        int restaurantId = resultSet.getInt("restaurant_id");
+        Timestamp orderTime = resultSet.getTimestamp("order_time");
+        LocalDateTime orderDateTime = orderTime.toLocalDateTime();
+        String formattedOrderTime = orderDateTime.toString();
+
+        String menuName = getMenuName(menuId);
+        String restaurantName = getRestaurantName(restaurantId);
+        String deliveryAddress = getDeliveryAddress(orderId);
+        System.out.println("주문 ID: " + orderId + ", 가게 이름: " + restaurantName + ", 메뉴 이름: " + menuName + ", 주문 시간: " + formattedOrderTime + ", 배달 주소: " + deliveryAddress);
     }
 
     public ResultSet getDeliveryList(String status){
@@ -131,7 +135,7 @@ public class DeliveryPerson {
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String deliveryAddress = resultSet.getString("delivery_address");
                 String restaurantAddress = getRestaurantAddress(restaurantId);
-                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
+                System.out.println("id: " + deliveryId + ", 가게 주소: " + restaurantAddress + ", 배달할 주소: " + deliveryAddress);
 
                 deliveryIdList.add(deliveryId);
             }
@@ -180,17 +184,18 @@ public class DeliveryPerson {
         }
     }
 
-    public ResultSet getDeliveryHistory() {
-        String sql = "SELECT * FROM Orders WHERE delivery_person_id = ? AND status = 'finished'";
+    public ResultSet getDeliveryHistory(int deliveryId) {
+        String sql = "SELECT * FROM Orders WHERE delivery_id = ? AND status = 'finished'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(1, deliveryId);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
             handleSQLException(e);
             return null;
         }
     }
+
 
     public String getRestaurantAddress(int restaurantId) {
         String sql = "SELECT address FROM Restaurant  WHERE restaurant_id = ?";
@@ -294,6 +299,26 @@ public class DeliveryPerson {
             e.printStackTrace();
         }
         return 0;  // SQL 오류가 발생하거나, 해당하는 레코드가 없는 경우
+    }
+
+    public List<Integer> getDeliveryIdList() {
+        String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ?";
+        List<Integer> deliveryIdList = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next()){
+                int deliveryId = resultSet.getInt("delivery_id ");
+                deliveryIdList.add(deliveryId);
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+
+        return deliveryIdList;
     }
 
     private void handleSQLException(SQLException e) {

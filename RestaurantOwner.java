@@ -40,12 +40,16 @@ public class RestaurantOwner {
             cuisineType = scanner.nextLine();
         }
 
-        System.out.println("배달 서비스를 제공할 지역을 입력해 주세요:");
-        String serviceArea = scanner.nextLine();
-        while(serviceArea == null || serviceArea.isEmpty()){
-            System.out.println("아무것도 입력하지 않으셨습니다.");
+        String serviceArea;
+        do {
+            System.out.println("배달 서비스를 제공할 지역을 입력해 주세요:");
             serviceArea = scanner.nextLine();
-        }
+
+            if (!serviceArea.equals("서울") && !serviceArea.equals("부산") && !serviceArea.equals("대구") && !serviceArea.equals("대전") && !serviceArea.equals("광주") && !serviceArea.equals("울산")) {
+                System.out.println("배달 서비스는 '서울', '부산', '대구', '대전', '광주', '울산'에서만 제공합니다. 다시 작성해주세요.");
+                serviceArea = null;
+            }
+        } while (serviceArea == null);
 
         boolean registerSuccess = registerRestaurant(name, address, cuisineType, serviceArea);
         if (registerSuccess) {
@@ -95,12 +99,16 @@ public class RestaurantOwner {
             newCuisineType = scanner.nextLine();
         }
 
-        System.out.println("음식점의 새로운 서비스 지역을 입력해 주세요:");
-        String newServiceArea = scanner.nextLine();
-        while(newServiceArea == null || newServiceArea.isEmpty()){
-            System.out.println("아무것도 입력하지 않으셨습니다.");
+        String newServiceArea;
+        do {
+            System.out.println("음식점의 새로운 서비스 지역을 입력해 주세요:");
             newServiceArea = scanner.nextLine();
-        }
+
+            if (!newServiceArea.equals("서울") && !newServiceArea.equals("부산") && !newServiceArea.equals("대구") && !newServiceArea.equals("대전") && !newServiceArea.equals("광주") && !newServiceArea.equals("울산")) {
+                System.out.println("배달 서비스는 '서울', '부산', '대구', '대전', '광주', '울산'에서만 제공합니다. 다시 작성해주세요.");
+                newServiceArea = null;
+            }
+        } while (newServiceArea == null);
 
         boolean updateSuccess = updateRestaurantInfo(restaurantId, newName, newAddress, newCuisineType, newServiceArea);
         if (updateSuccess) {
@@ -120,7 +128,7 @@ public class RestaurantOwner {
 
         Integer restaurantId;
         do {
-            System.out.println("추가할 메뉴가 속한 식당의 id을 입력해 주세요:");
+            System.out.println("메뉴를 관리할 식당의 id을 입력해 주세요:");
             restaurantId = scanner.nextInt();
             scanner.nextLine();
 
@@ -368,7 +376,7 @@ public class RestaurantOwner {
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String name = resultSet.getString("name");
 
-                System.out.println("식당 ID: " + restaurantId + " 식당 이름: "+ name);
+                System.out.println("식당 ID: " + restaurantId + ", 식당 이름: "+ name);
 
                 restaurantIdList.add(restaurantId);
             }
@@ -465,7 +473,7 @@ public class RestaurantOwner {
                 String formattedOrderTime = orderDateTime.toString();
                 String menuName = getMenuName(menuId);
 
-                System.out.println("주문 ID: " + orderId + " 메뉴명: "+ menuName + " 주문 상태: " + orderStatus + " 주문 시간: " + formattedOrderTime);
+                System.out.println("주문 ID: " + orderId + ", 메뉴명: "+ menuName + ", 주문 상태: " + orderStatus + ", 주문 시간: " + formattedOrderTime);
 
                 orderIdList.add(orderId);
             }
