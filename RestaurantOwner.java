@@ -63,13 +63,16 @@ public class RestaurantOwner {
             return;
         }
 
-        System.out.println("정보를 업데이트할 음식점의 id를 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
+        Integer restaurantId;
+        do {
+            System.out.println("정보를 업데이트할 음식점의 id를 입력해 주세요:");
+            restaurantId = scanner.nextInt();
+            scanner.nextLine();
 
-        if(!restaurantIdList.contains(restaurantId)){
-            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
-            return;
-        }
+            if(!restaurantIdList.contains(restaurantId)){
+                System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(restaurantId));
 
         System.out.println("음식점의 새로운 이름을 입력해 주세요:");
         String newName = scanner.nextLine();
@@ -115,13 +118,16 @@ public class RestaurantOwner {
             return;
         }
 
-        System.out.println("추가할 메뉴가 속한 식당의 id을 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
+        Integer restaurantId;
+        do {
+            System.out.println("추가할 메뉴가 속한 식당의 id을 입력해 주세요:");
+            restaurantId = scanner.nextInt();
+            scanner.nextLine();
 
-        if(!restaurantIdList.contains(restaurantId)){
-            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
-            return;
-        }
+            if(!restaurantIdList.contains(restaurantId)){
+                System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(restaurantId));
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("메뉴 관리:");
@@ -212,20 +218,34 @@ public class RestaurantOwner {
             return;
         }
 
-        System.out.println("주문완료를 처리할 식당의 id를 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
+        Integer restaurantId;
+        do {
+            System.out.println("주문완료를 처리할 식당의 id를 입력해 주세요:");
+            restaurantId = scanner.nextInt();
+            scanner.nextLine();
 
-        if(!restaurantIdList.contains(restaurantId)){
-            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            if(!restaurantIdList.contains(restaurantId)){
+                System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(restaurantId));
+
+        ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
+        List<Integer> orderIdList = printOrderSet(orderSet); // order 정보들 출력
+
+        if(orderIdList.isEmpty()){ // 식당이 없는 경우
             return;
         }
 
-        ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
-        printOrderSet(orderSet); // order 정보들 출력
+        Integer orderId;
+        do {
+            System.out.println("처리할 주문의 ID를 입력해 주세요:");
+            orderId = scanner.nextInt();
+            scanner.nextLine();
 
-        System.out.println("처리할 주문의 ID를 입력해 주세요:");
-        int orderId = scanner.nextInt();
-        scanner.nextLine();
+            if(!restaurantIdList.contains(orderId)){
+                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(orderId));
 
         updateOrderStatus(orderId, "cooked");
     }
@@ -238,13 +258,15 @@ public class RestaurantOwner {
             return;
         }
 
-        System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
-        Integer restaurantId = scanner.nextInt();
+        Integer restaurantId;
+        do {
+            System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
+            restaurantId = scanner.nextInt();
 
-        if(!restaurantIdList.contains(restaurantId)){
-            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
-            return;
-        }
+            if(!restaurantIdList.contains(restaurantId)){
+                System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(restaurantId));
 
         ResultSet orderHistory = getOrderHistory(restaurantId);
         printOrderSet(orderHistory);
@@ -425,28 +447,33 @@ public class RestaurantOwner {
         }
     }
 
-    public void printOrderSet(ResultSet orderSet){
+    public List<Integer> printOrderSet(ResultSet resultSet){
+        List<Integer> orderIdList = new ArrayList<>();
         try {
-            if(orderSet.wasNull()){
+            if(resultSet.wasNull()){
                 System.out.println("처리할 주문이 없습니다.");
-                return;
+                return null;
             }
 
-            while (orderSet.next()) {
-                int orderId = orderSet.getInt("order_id");
-                String orderStatus = orderSet.getString("status");
-                int menuId = orderSet.getInt("menu_id");
-                Timestamp orderTime = orderSet.getTimestamp("order_time");
+            while (resultSet.next()) {
+                int orderId = resultSet.getInt("order_id");
+                String orderStatus = resultSet.getString("status");
+                int menuId = resultSet.getInt("menu_id");
+                Timestamp orderTime = resultSet.getTimestamp("order_time");
 
                 LocalDateTime orderDateTime = orderTime.toLocalDateTime();
                 String formattedOrderTime = orderDateTime.toString();
                 String menuName = getMenuName(menuId);
 
                 System.out.println("주문 ID: " + orderId + " 메뉴명: "+ menuName + " 주문 상태: " + orderStatus + " 주문 시간: " + formattedOrderTime);
+
+                orderIdList.add(orderId);
             }
         } catch (SQLException e) {
             handleSQLException(e);
         }
+
+        return orderIdList;
     }
 
     public String getMenuName(int menuId) { ////////////////////////// 중복 리팩토링 필요
