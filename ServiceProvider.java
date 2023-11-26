@@ -174,33 +174,38 @@ public class ServiceProvider {
     }
 
     public void updateUserService(){
-        System.out.println("수정할 유저의 ID를 입력해 주세요:");
-        int userId = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println("수정할 유저의 이메일을 입력해 주세요:");
+        String email = scanner.nextLine();
 
-        String newName = null;
-        while (newName == null || newName.isEmpty()) {
+        int userId = getUserIdByEmail(email);
+
+        String newName;
+        do {
             System.out.println("새로운 이름을 입력해 주세요:");
             newName = scanner.nextLine();
-        }
+        } while (newName == null || newName.isEmpty());
 
-        String newPassword = null;
-        while (newPassword == null || newPassword.isEmpty() || !isValidPassword(newPassword)) {
+        String newPassword;
+        do {
             System.out.println("새로운 비밀번호를 입력해 주세요:");
             newPassword = scanner.nextLine();
-            if (newPassword == null || newPassword.isEmpty() || !isValidPassword(newPassword)) {
-                System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
-            }
-        }
 
-        String newRole = null;
-        while (newRole == null || newRole.isEmpty() || (!newRole.equals("Customer") && !newRole.equals("RestaurantOwner") && !newRole.equals("DeliveryPerson") && !newRole.equals("ServiceProvider"))) {
+            if (!isValidPassword(newPassword)) {
+                System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
+                newPassword = null;
+            }
+        } while (newPassword == null);
+
+        String newRole;
+        do {
             System.out.println("새로운 역할을 입력해 주세요:");
             newRole = scanner.nextLine();
-            if (newRole == null || newRole.isEmpty() || (!newRole.equals("Customer") && !newRole.equals("RestaurantOwner") && !newRole.equals("DeliveryPerson") && !newRole.equals("ServiceProvider"))) {
+
+            if (!newRole.equals("Customer") && !newRole.equals("RestaurantOwner") && !newRole.equals("DeliveryPerson") && !newRole.equals("ServiceProvider")) {
                 System.out.println("역할은 'Customer', 'RestaurantOwner', 'DeliveryPerson', 'ServiceProvider' 중 하나여야 합니다.");
+                newRole = null;
             }
-        }
+        } while (newRole == null);
 
         updateUser(userId, newName, newPassword, newRole);
     }
