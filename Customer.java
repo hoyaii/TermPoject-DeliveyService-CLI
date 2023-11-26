@@ -43,6 +43,10 @@ public class Customer {
         ResultSet resultSet = searchRestaurants(name, location, type);
         List<Integer> restaurantIdList= printRestaurantList(resultSet);
 
+        if(restaurantIdList.isEmpty()){
+            return;
+        }
+
         System.out.println("메뉴를 확인하고 싶은 음식점의 ID를 입력해주세요.");
         int restaurantId = scanner.nextInt();
         scanner.nextLine();
@@ -155,6 +159,11 @@ public class Customer {
     public List<Integer> printMenuList(ResultSet resultSet){
         List<Integer> menuIdList = new ArrayList<>();
         try {
+            if(resultSet.wasNull()){
+                System.out.println("메뉴가 없습니다.");
+                return null;
+            }
+
             while (resultSet.next()) {
                 int menuId = resultSet.getInt("menu_id");
                 String name = resultSet.getString("name");
@@ -174,7 +183,11 @@ public class Customer {
 
     public void orderService(int restaurantId){
         ResultSet resultSet = getMenu(restaurantId);
-        List<Integer> menuIdList = printMenuList(resultSet);
+        List<Integer> menuIdList = printMenuList(resultSet); // 메뉴들 출력
+
+        if(menuIdList.isEmpty()){ // 주문이 없는 경우
+            return;
+        }
 
         System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
         int menuId = scanner.nextInt();
@@ -249,6 +262,10 @@ public class Customer {
     public void getDeliveryStatusService(){
         ResultSet resultSet = getUserOrders();
         List<Integer> orderIdList = printOrderHistory(resultSet);
+
+        if(orderIdList.isEmpty()){
+            return;
+        }
 
         System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
         int orderId = scanner.nextInt();
