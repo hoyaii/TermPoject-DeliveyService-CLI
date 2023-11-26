@@ -32,8 +32,7 @@ public class ServiceProvider {
                 return false;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return false;
         }
     }
@@ -78,8 +77,7 @@ public class ServiceProvider {
             preparedStatement.setString(6, address);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -168,8 +166,7 @@ public class ServiceProvider {
             preparedStatement.setInt(4, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -217,8 +214,7 @@ public class ServiceProvider {
             preparedStatement.setInt(1, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -242,8 +238,7 @@ public class ServiceProvider {
                 return resultSet.getInt("user_id");
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
 
         return 0;
@@ -261,8 +256,7 @@ public class ServiceProvider {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -275,8 +269,7 @@ public class ServiceProvider {
             preparedStatement.setInt(2, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -288,5 +281,10 @@ public class ServiceProvider {
     public boolean isValidPassword(String password) {
         Matcher matcher = PASSWORD_PATTERN.matcher(password);
         return matcher.matches();
+    }
+
+    private void handleSQLException(SQLException e) {
+        System.out.println("SQL 쿼리 실행에서 에러가 발생하였습니다.");
+        e.printStackTrace();
     }
 }

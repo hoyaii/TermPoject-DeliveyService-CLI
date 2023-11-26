@@ -30,8 +30,7 @@ public class RestaurantOwner {
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return false;
         }
     }
@@ -86,8 +85,7 @@ public class RestaurantOwner {
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return false;
         }
     }
@@ -146,8 +144,7 @@ public class RestaurantOwner {
             preparedStatement.setInt(3, restaurantId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -160,8 +157,7 @@ public class RestaurantOwner {
             preparedStatement.setInt(3, menuId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -172,8 +168,7 @@ public class RestaurantOwner {
             preparedStatement.setInt(1, menuId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -276,8 +271,7 @@ public class RestaurantOwner {
             preparedStatement.setInt(1, userId);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            System.out.println("SQL 실행 중 오류가 발생했습니다.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -297,8 +291,7 @@ public class RestaurantOwner {
 
             return true;
         } catch (SQLException e) {
-            System.out.println("Error retrieving order history.");
-            e.printStackTrace();
+            handleSQLException(e);
             return false;
         }
     }
@@ -315,8 +308,7 @@ public class RestaurantOwner {
                 menuNameList.add(resultSet.getString("name"));
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
 
         return menuNameList;
@@ -344,8 +336,7 @@ public class RestaurantOwner {
                 System.out.println("처리가 실패하였습니다.");
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -375,8 +366,7 @@ public class RestaurantOwner {
             preparedStatement.setInt(1, restaurantId);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            System.out.println("SQL 질의 실행 중 오류가 발생했습니다.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -388,8 +378,7 @@ public class RestaurantOwner {
             preparedStatement.setInt(1, restaurantId);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -414,8 +403,7 @@ public class RestaurantOwner {
                 System.out.println("주문 ID: " + orderId + " 메뉴명: "+ menuName + " 주문 상태: " + orderStatus + " 주문 시간: " + formattedOrderTime);
             }
         } catch (SQLException e) {
-            System.out.println("Error retrieving order history.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -444,8 +432,7 @@ public class RestaurantOwner {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -463,9 +450,13 @@ public class RestaurantOwner {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
+    }
+
+    private void handleSQLException(SQLException e) {
+        System.out.println("SQL 쿼리 실행에서 에러가 발생하였습니다.");
+        e.printStackTrace();
     }
 }

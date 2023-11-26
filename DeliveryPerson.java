@@ -24,8 +24,7 @@ public class DeliveryPerson {
             preparedStatement.setString(2, status);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -72,8 +71,7 @@ public class DeliveryPerson {
             preparedStatement.setInt(2, deliveryId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -85,8 +83,7 @@ public class DeliveryPerson {
             preparedStatement.setInt(2, userId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -145,8 +142,7 @@ public class DeliveryPerson {
             preparedStatement.setInt(1, userId);
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -167,8 +163,7 @@ public class DeliveryPerson {
                 System.out.println("주문 ID: " + orderId + ", 가게 이름: " + restaurantName + "메뉴 이름: " + menuName + "주문 시간: " + formattedOrderTime);
             }
         } catch (SQLException e) {
-            System.out.println("Error retrieving delivery history.");
-            e.printStackTrace();
+            handleSQLException(e);
         }
     }
 
@@ -184,8 +179,7 @@ public class DeliveryPerson {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -202,8 +196,7 @@ public class DeliveryPerson {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -221,8 +214,7 @@ public class DeliveryPerson {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("SQL 쿼리 실행 중 오류가 발생했습니다.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
     }
@@ -240,9 +232,13 @@ public class DeliveryPerson {
                 return null;
             }
         } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+            handleSQLException(e);
             return null;
         }
+    }
+
+    private void handleSQLException(SQLException e) {
+        System.out.println("SQL 쿼리 실행에서 에러가 발생하였습니다.");
+        e.printStackTrace();
     }
 }
