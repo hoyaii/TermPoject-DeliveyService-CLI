@@ -11,6 +11,7 @@ class Main {
             System.out.println("CLI의 민족에 오신 것을 환영합니다! 아래 옵션 중 선택해 주세요:");
             System.out.println("1. 로그인");
             System.out.println("2. 회원 가입");
+            System.out.println("3. 서비스 종료");
 
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -37,13 +38,13 @@ class Main {
 
                 // 선택된 핸들러로 계속 처리, 기능 이용을 마치면 다른 기능을 또 이용하도록
                 if (handler != null) {
-                    while(true) {
-                        handler.run();
-                    }
+                    handler.run();
                 }
             } else if (option == 2) {
                 // 회원 가입 진행
                 serviceProvider.registerUserService();
+            } else if (option == 3) { // 종료 선택
+                break;
             }
         }
     }
