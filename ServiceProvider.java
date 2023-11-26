@@ -223,9 +223,10 @@ public class ServiceProvider {
     }
 
     public void deleteUserService(){
-        System.out.println("삭제할 유저의 ID를 입력해 주세요:");
-        int userId = scanner.nextInt();
-        scanner.nextLine();
+        System.out.println("삭제할 유저의 이메일을 입력해 주세요:");
+        String email = scanner.nextLine();
+
+        int userId = getUserIdByEmail(email);
 
         deleteUser(userId);
     }
