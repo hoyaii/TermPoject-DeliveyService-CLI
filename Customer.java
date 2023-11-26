@@ -46,14 +46,16 @@ public class Customer {
             return;
         }
 
-        System.out.println("메뉴를 확인하고 싶은 음식점의 ID를 입력해주세요.");
-        int restaurantId = scanner.nextInt();
-        scanner.nextLine();
+        Integer restaurantId;
+        do {
+            System.out.println("메뉴를 확인하고 싶은 음식점의 ID를 입력해주세요.");
+            restaurantId = scanner.nextInt();
+            scanner.nextLine();
 
-        if (!restaurantIdList.contains(restaurantId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
-            System.out.println("유효하지 않은 음식점 ID입니다.");
-            return;
-        }
+            if(!restaurantIdList.contains(restaurantId)){
+                System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(restaurantId));
 
         orderService(restaurantId);
     }
@@ -183,14 +185,16 @@ public class Customer {
             return;
         }
 
-        System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
-        int menuId = scanner.nextInt();
-        scanner.nextLine();
+        Integer menuId;
+        do {
+            System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
+            menuId = scanner.nextInt();
+            scanner.nextLine();
 
-        if (!menuIdList.contains(menuId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
-            System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
-            return;
-        }
+            if(!menuIdList.contains(menuId)){
+                System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
+            }
+        } while(!menuIdList.contains(menuId));
 
         String address = getUserAddress(userId);
         boolean requestSuccess = requestDelivery(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
@@ -259,14 +263,16 @@ public class Customer {
             return;
         }
 
-        System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
-        int orderId = scanner.nextInt();
-        scanner.nextLine();
+        Integer orderId;
+        do {
+            System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
+            orderId = scanner.nextInt();
+            scanner.nextLine();
 
-        if (!orderIdList.contains(orderId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
-            System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
-            return;
-        }
+            if(!orderIdList.contains(orderId)){
+                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            }
+        } while(!orderIdList.contains(orderId));
 
         String deliveryStatus = getDeliveryStatus(orderId);
 
@@ -296,13 +302,20 @@ public class Customer {
         ResultSet resultSet = getUserOrders();
         List<Integer> orderIdList = printOrderHistory(resultSet);
 
-        System.out.println("리뷰를 작성할 주문의 ID를 입력해 주세요:");
-        int orderId = scanner.nextInt();
-
-        if (!orderIdList.contains(orderId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
-            System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+        if(orderIdList.isEmpty()){
             return;
         }
+
+        Integer orderId;
+        do {
+            System.out.println("리뷰를 작성할 주문의 ID를 입력해 주세요:");
+            orderId = scanner.nextInt();
+            scanner.nextLine();
+
+            if(!orderIdList.contains(orderId)){
+                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            }
+        } while(!orderIdList.contains(orderId));
 
         int rating;
         do {
