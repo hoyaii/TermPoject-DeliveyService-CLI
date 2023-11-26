@@ -101,15 +101,20 @@ public class RestaurantOwner {
     }
 
     public void manageMenuService() {
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
+        ResultSet resultSet = getRestaurantList();
+        List<Integer> restaurantIdList = printRestaurantList(resultSet);
+
+        if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
             return;
         }
 
         System.out.println("추가할 메뉴가 속한 식당의 id을 입력해 주세요:");
         Integer restaurantId = scanner.nextInt();
 
-        // restaurantId가 존재하는 것인지 확인하는 로직 필요 *****************************
+        if(!restaurantIdList.contains(restaurantId)){
+            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            return;
+        }
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("메뉴 관리:");
