@@ -53,7 +53,7 @@ public class ServiceProvider {
             System.out.println("비밀번호를 입력하세요:");
             password = scanner.nextLine();
             if (password == null || password.isEmpty() || !isValidPassword(password)) {
-                System.out.println("유효한 비밀번호를 입력해주세요.");
+                System.out.println("올바른 비밀번호를 입력해주세요.");
             }
         }
 
@@ -67,7 +67,7 @@ public class ServiceProvider {
     }
 
     public void registerUser(String email, String username, String password, String role, String phoneNumber, String address) {
-        String sql = "INSERT INTO User (email, username, password, role, phoneNumber, address) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO User (email, username, password, role, phone_number, address) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);
@@ -85,52 +85,60 @@ public class ServiceProvider {
 
     public void registerUserService(){
         String email = null;
-        while (email == null || email.isEmpty() || !isValidEmail(email) || getUserIdByEmail(email) != null) {
+        do {
             System.out.println("이메일을 입력해 주세요:");
             email = scanner.nextLine();
-            if (email == null || email.isEmpty() || !isValidEmail(email)) {
-                System.out.println("올바른 이메일 형식을 입력해주세요.");
-            } else if (getUserIdByEmail(email) != null) { // 이메일 중복 확인
-                System.out.println("이미 사용 중인 이메일입니다. 다른 이메일을 입력해주세요.");
-                email = null; // 이메일 초기화
-            }
-        }
 
-        String username = null;
-        while (username == null || username.isEmpty()) {
+            if (!isValidEmail(email)) {
+                System.out.println("올바른 이메일 형식을 입력해주세요.");
+                email = null;
+            }
+
+            if (getUserIdByEmail(email) != 0) { // 이메일 중복 확인
+                System.out.println("이미 사용 중인 이메일입니다. 다른 이메일을 입력해주세요.");
+                email = null;
+            }
+        } while (email == null);
+
+        String username;
+        do {
             System.out.println("이름을 입력해 주세요:");
             username = scanner.nextLine();
-        }
+        } while (username == null || username.isEmpty());
 
-        String password = null;
-        while (password == null || password.isEmpty() || !isValidPassword(password)) {
+        String password;
+        do {
             System.out.println("비밀번호를 입력해 주세요:");
             password = scanner.nextLine();
-            if (password == null || password.isEmpty() || !isValidPassword(password)) {
-                System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
-            }
-        }
 
-        String role = null;
-        while (role == null || role.isEmpty() || (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider"))) {
+            if (!isValidPassword(password)) {
+                System.out.println("8자 이상의 영문과 숫자를 입력해주세요.");
+                password = null;
+            }
+        } while (password == null);
+
+        String role;
+        do {
             System.out.println("역할을 입력해 주세요:");
             role = scanner.nextLine();
-            if (role == null || role.isEmpty() || (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider"))) {
-                System.out.println("역할은 'Customer', 'RestaurantOwner', 'DeliveryPerson', 'ServiceProvider' 중 하나여야 합니다.");
-            }
-        }
 
-        String phoneNumber = null;
-        while(phoneNumber == null || phoneNumber.isEmpty()){
+            if (!role.equals("Customer") && !role.equals("RestaurantOwner") && !role.equals("DeliveryPerson") && !role.equals("ServiceProvider")) {
+                System.out.println("역할은 'Customer', 'RestaurantOwner', 'DeliveryPerson', 'ServiceProvider' 중 하나여야 합니다.");
+                role = null;
+            }
+        } while (role == null);
+
+        String phoneNumber;
+        do {
             System.out.println("휴대폰 번호를 입력해 주세요:");
             phoneNumber = scanner.nextLine();
-        }
+        } while (phoneNumber == null || phoneNumber.isEmpty());
 
-        String address = null;
-        while(address == null || address.isEmpty()){
+        String address;
+        do {
             System.out.println("주소를 입력해 주세요:");
             address = scanner.nextLine();
-        }
+        } while (address == null || address.isEmpty());
 
         registerUser(email, username, password, role, phoneNumber, address);
 
@@ -140,8 +148,11 @@ public class ServiceProvider {
         if (role.equals("DeliveryPerson")) {
             System.out.println("이어서 다음 정보를 입력해주세요.");
 
-            System.out.println("배달 지역을 입력해 주세요:");
-            String serviceArea = scanner.nextLine();
+            String serviceArea;
+            do {
+                System.out.println("배달 지역을 입력해 주세요:");
+                serviceArea = scanner.nextLine();
+            } while (serviceArea == null || serviceArea.isEmpty());
 
             addDeliveryPersonInfo(userId, serviceArea);
         }
@@ -214,22 +225,22 @@ public class ServiceProvider {
         deleteUser(userId);
     }
 
-    public Integer getUserIdByEmail(String email) {
+    public int getUserIdByEmail(String email) {
         String sql = "SELECT user_id FROM User WHERE email = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, email);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             if (resultSet.next()) {
-                return resultSet.getInt("id");
-            } else {
-                return null;
+                return resultSet.getInt("user_id");
             }
         } catch (SQLException e) {
             System.out.println("Error executing SQL query.");
             e.printStackTrace();
-            return null;
         }
+
+        return 0;
     }
 
     public String getRoleByEmail(String email) {
