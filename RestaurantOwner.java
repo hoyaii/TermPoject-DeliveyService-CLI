@@ -205,13 +205,20 @@ public class RestaurantOwner {
     }
 
     public void finishCookingService() {
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
+        ResultSet resultSet = getRestaurantList();
+        List<Integer> restaurantIdList = printRestaurantList(resultSet);
+
+        if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
             return;
         }
 
-        System.out.println("주문을 처리할 식당의 id를 입력해 주세요:");
+        System.out.println("주문완료를 처리할 식당의 id를 입력해 주세요:");
         Integer restaurantId = scanner.nextInt();
+
+        if(!restaurantIdList.contains(restaurantId)){
+            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            return;
+        }
 
         ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
         printOrderSet(orderSet); // order 정보들 출력
@@ -224,12 +231,20 @@ public class RestaurantOwner {
     }
 
     public void getOrderHistoryService(){
-        if(!printRestaurantList(getRestaurantList())){
-            System.out.println("관리하고 있는 식당이 없습니다.");
+        ResultSet resultSet = getRestaurantList();
+        List<Integer> restaurantIdList = printRestaurantList(resultSet);
+
+        if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
             return;
         }
+
         System.out.println("주문 이력을 조회할 음식점의 ID을 입력해 주세요:");
         Integer restaurantId = scanner.nextInt();
+
+        if(!restaurantIdList.contains(restaurantId)){
+            System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            return;
+        }
 
         ResultSet orderHistory = getOrderHistory(restaurantId);
         printOrderSet(orderHistory);
