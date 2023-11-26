@@ -3,6 +3,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class DeliveryPerson {
@@ -102,29 +104,24 @@ public class DeliveryPerson {
 
     public void finishDeliveryService(){
         System.out.println("진행중인 배달 내역입니다.");
+
         ResultSet resultSet = getDeliveryList("accepted");
+        List<Integer> deliveryIdList = printDeliveryList(resultSet);
 
-        try {
-            if(resultSet.wasNull()){
-                System.out.println("배달 목록이 없습니다.");
-                return;
-            }
-
-            while (resultSet.next()) {
-                int deliveryId = resultSet.getInt("delivery_id ");
-                int restaurantId = resultSet.getInt("restaurant_id");
-                String deliveryAddress = resultSet.getString("delivery_address");
-                String restaurantAddress = getRestaurantAddress(restaurantId);
-                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
-            }
-        } catch (SQLException e) {
-            System.out.println("Error executing SQL query.");
-            e.printStackTrace();
+        if(deliveryIdList.isEmpty()){
+            return;
         }
 
-        System.out.println("완료한 배달의 ID를 입력해 주세요:");
-        int deliveryId = scanner.nextInt();
-        scanner.nextLine();
+        Integer deliveryId;
+        do {
+            System.out.println("완료한 배달의 ID를 입력해 주세요:");
+            deliveryId = scanner.nextInt();
+            scanner.nextLine();
+
+            if(!deliveryIdList.contains(deliveryId)){
+                System.out.println("선택하신 배달 ID는 유효하지 않습니다.");
+            }
+        } while(!deliveryIdList.contains(deliveryId));
 
         Integer orderId = getOrderIdByDeliveryId(deliveryId); // deliveryId를 가지고 orderId를 구한다
 
@@ -133,6 +130,31 @@ public class DeliveryPerson {
         updateUserStatus("free");
 
         System.out.println("배달 완료 처리가 되었습니다.");
+    }
+
+    public List<Integer> printDeliveryList(ResultSet resultSet){
+        List<Integer> deliveryIdList = new ArrayList<>();
+        try {
+            if(resultSet.wasNull()){
+                System.out.println("배달 목록이 없습니다.");
+                return null;
+            }
+
+            while (resultSet.next()) {
+                int deliveryId = resultSet.getInt("delivery_id ");
+                int restaurantId = resultSet.getInt("restaurant_id");
+                String deliveryAddress = resultSet.getString("delivery_address");
+                String restaurantAddress = getRestaurantAddress(restaurantId);
+                System.out.println("id: " + deliveryId + " 가게 주소: " + restaurantAddress + " 배달할 주소: " + deliveryAddress);
+
+                deliveryIdList.add(deliveryId);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error executing SQL query.");
+            e.printStackTrace();
+        }
+
+        return deliveryIdList;
     }
 
     public ResultSet getDeliveryHistory() {

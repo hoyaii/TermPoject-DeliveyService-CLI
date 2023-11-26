@@ -17,20 +17,6 @@ public class Customer {
         this.userId = userId;
     }
 
-    public ResultSet searchRestaurants(String name, String location, String type) {
-        String sql = "SELECT * FROM Restaurant WHERE name LIKE ? AND service_area  LIKE ? AND cuisine_type LIKE ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setString(1, "%" + name + "%");
-            preparedStatement.setString(2, "%" + location + "%");
-            preparedStatement.setString(3, "%" + type + "%");
-            return preparedStatement.executeQuery();
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return null;
-        }
-    }
-
     public void searchRestaurantsService(){ // ********************** 3가지 쿼리 기능 테스트 필요
         System.out.println("검색하실 음식점의 이름을 입력해 주세요:");
         String name = scanner.nextLine();
@@ -39,7 +25,7 @@ public class Customer {
         System.out.println("검색하실 음식점의 음식 종류를 입력해 주세요:");
         String type = scanner.nextLine();
 
-        ResultSet resultSet = searchRestaurants(name, location, type);
+        ResultSet resultSet = getRestaurants(name, location, type);
         List<Integer> restaurantIdList= printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){
@@ -58,6 +44,139 @@ public class Customer {
         } while(!restaurantIdList.contains(restaurantId));
 
         orderService(restaurantId);
+    }
+
+    public void orderService(int restaurantId){
+        ResultSet resultSet = getMenu(restaurantId);
+        List<Integer> menuIdList = printMenuList(resultSet); // 메뉴들 출력
+
+        if(menuIdList.isEmpty()){ // 주문이 없는 경우
+            return;
+        }
+
+        Integer menuId;
+        do {
+            System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
+            menuId = scanner.nextInt();
+            scanner.nextLine();
+
+            if(!menuIdList.contains(menuId)){
+                System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
+            }
+        } while(!menuIdList.contains(menuId));
+
+        String address = getUserAddress(userId);
+
+        boolean requestSuccess = requestDeliveryService(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
+        if (!requestSuccess) {
+            System.out.println("주문에 실패하였습니다.");
+        }
+
+        boolean orderSuccess = createOrder(restaurantId, menuId); // 주문 생성
+        if (!orderSuccess) {
+            System.out.println("주문에 실패하였습니다.");
+        }
+
+        System.out.println("주문이 성공적으로 요청되었습니다.");
+    }
+
+    public boolean requestDeliveryService(int restaurantId, String address){
+        String serviceArea = getServiceArea(restaurantId);
+
+        List<Integer> availableDeliveryPersons = getAvailableDeliveryPeople(serviceArea);
+
+        if(availableDeliveryPersons.isEmpty()){
+            System.out.println("배달 가능한 배달원이 존재하지 않습니다.");
+            return false;
+        }
+
+        Random rand = new Random(); // 가능한 기사중 아무나 한명을 선택한다
+        int randomIndex = rand.nextInt(availableDeliveryPersons.size());
+        Integer selectedDeliveryPersonId = availableDeliveryPersons.get(randomIndex);
+
+        createDelivery(restaurantId, address, selectedDeliveryPersonId);
+
+        return true;
+    }
+
+    public void getDeliveryStatusService(){
+        ResultSet resultSet = getUserOrders();
+        List<Integer> orderIdList = printOrderHistory(resultSet);
+
+        if(orderIdList.isEmpty()){
+            return;
+        }
+
+        Integer orderId;
+        do {
+            System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
+            orderId = scanner.nextInt();
+            scanner.nextLine();
+
+            if(!orderIdList.contains(orderId)){
+                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            }
+        } while(!orderIdList.contains(orderId));
+
+        String deliveryStatus = getDeliveryStatus(orderId);
+
+        System.out.println("해당 주문의 배달 상태는 " + deliveryStatus + "입니다!");
+    }
+
+    public void writeReviewService(){
+        ResultSet resultSet = getUserOrders();
+        List<Integer> orderIdList = printOrderHistory(resultSet);
+
+        if(orderIdList.isEmpty()){
+            return;
+        }
+
+        Integer orderId;
+        do {
+            System.out.println("리뷰를 작성할 주문의 ID를 입력해 주세요:");
+            orderId = scanner.nextInt();
+            scanner.nextLine();
+
+            if(!orderIdList.contains(orderId)){
+                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
+            }
+        } while(!orderIdList.contains(orderId));
+
+        int rating;
+        do {
+            System.out.println("리뷰의 별점을 입력해 주세요 (1~5):");
+            rating = scanner.nextInt();
+            if (rating < 1 || rating > 5) {
+                System.out.println("잘못 입력하셨습니다. 별점은 1~5 사이의 숫자로 입력해 주세요.");
+            }
+        } while (rating < 1 || rating > 5);
+
+        scanner.nextLine();
+
+        String reviewContent;
+        do {
+            System.out.println("리뷰 내용을 입력해 주세요:");
+            reviewContent = scanner.nextLine();
+            if (reviewContent.trim().isEmpty()) {
+                System.out.println("리뷰 내용이 입력되지 않았습니다. 리뷰 내용을 입력해주세요.");
+            }
+        } while (reviewContent.trim().isEmpty());
+
+        createReview(orderId, rating, reviewContent);
+    }
+
+    public ResultSet getRestaurants(String name, String location, String type) {
+        String sql = "SELECT * FROM Restaurant WHERE name LIKE ? AND service_area  LIKE ? AND cuisine_type LIKE ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setString(1, "%" + name + "%");
+            preparedStatement.setString(2, "%" + location + "%");
+            preparedStatement.setString(3, "%" + type + "%");
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
     }
 
     public List<Integer> printRestaurantList(ResultSet resultSet){
@@ -83,25 +202,6 @@ public class Customer {
         }
 
         return restaurantIdList;
-    }
-
-    public boolean requestDelivery(int restaurantId, String address){
-        String serviceArea = getServiceArea(restaurantId);
-
-        List<Integer> availableDeliveryPersons = getAvailableDeliveryPeople(serviceArea);
-
-        if(availableDeliveryPersons.isEmpty()){
-            System.out.println("배달 가능한 배달원이 존재하지 않습니다.");
-            return false;
-        }
-
-        Random rand = new Random(); // 가능한 기사중 아무나 한명을 선택한다
-        int randomIndex = rand.nextInt(availableDeliveryPersons.size());
-        Integer selectedDeliveryPersonId = availableDeliveryPersons.get(randomIndex);
-
-        createDelivery(restaurantId, address, selectedDeliveryPersonId);
-
-        return true;
     }
 
     public void createDelivery(int restaurantId, String address, int deliveryPersonId) {
@@ -177,39 +277,6 @@ public class Customer {
         return menuIdList;
     }
 
-    public void orderService(int restaurantId){
-        ResultSet resultSet = getMenu(restaurantId);
-        List<Integer> menuIdList = printMenuList(resultSet); // 메뉴들 출력
-
-        if(menuIdList.isEmpty()){ // 주문이 없는 경우
-            return;
-        }
-
-        Integer menuId;
-        do {
-            System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
-            menuId = scanner.nextInt();
-            scanner.nextLine();
-
-            if(!menuIdList.contains(menuId)){
-                System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
-            }
-        } while(!menuIdList.contains(menuId));
-
-        String address = getUserAddress(userId);
-        boolean requestSuccess = requestDelivery(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
-        if (!requestSuccess) {
-            System.out.println("주문에 실패하였습니다.");
-        }
-
-        boolean orderSuccess = createOrder(restaurantId, menuId); // 주문 생성
-        if (!orderSuccess) {
-            System.out.println("주문에 실패하였습니다.");
-        }
-
-        System.out.println("주문이 성공적으로 요청되었습니다.");
-    }
-
     public String getDeliveryStatus(int orderId) {
         String sql = "SELECT order_status FROM Orders WHERE order_id = ?";
         try {
@@ -255,31 +322,7 @@ public class Customer {
         return orderIdList;
     }
 
-    public void getDeliveryStatusService(){
-        ResultSet resultSet = getUserOrders();
-        List<Integer> orderIdList = printOrderHistory(resultSet);
-
-        if(orderIdList.isEmpty()){
-            return;
-        }
-
-        Integer orderId;
-        do {
-            System.out.println("확인하고 싶은 주문의 ID를 입력해주세요:");
-            orderId = scanner.nextInt();
-            scanner.nextLine();
-
-            if(!orderIdList.contains(orderId)){
-                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
-            }
-        } while(!orderIdList.contains(orderId));
-
-        String deliveryStatus = getDeliveryStatus(orderId);
-
-        System.out.println("해당 주문의 배달 상태는 " + deliveryStatus + "입니다!");
-    }
-
-    public void writeReview(int orderId, int rating, String reviewContent) {
+    public void createReview(int orderId, int rating, String reviewContent) {
         String sql = "INSERT INTO Reviews (order_id, rating, content) VALUES (?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
@@ -296,48 +339,6 @@ public class Customer {
         } catch (SQLException e) {
             handleSQLException(e);
         }
-    }
-
-    public void writeReviewService(){
-        ResultSet resultSet = getUserOrders();
-        List<Integer> orderIdList = printOrderHistory(resultSet);
-
-        if(orderIdList.isEmpty()){
-            return;
-        }
-
-        Integer orderId;
-        do {
-            System.out.println("리뷰를 작성할 주문의 ID를 입력해 주세요:");
-            orderId = scanner.nextInt();
-            scanner.nextLine();
-
-            if(!orderIdList.contains(orderId)){
-                System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
-            }
-        } while(!orderIdList.contains(orderId));
-
-        int rating;
-        do {
-            System.out.println("리뷰의 별점을 입력해 주세요 (1~5):");
-            rating = scanner.nextInt();
-            if (rating < 1 || rating > 5) {
-                System.out.println("잘못 입력하셨습니다. 별점은 1~5 사이의 숫자로 입력해 주세요.");
-            }
-        } while (rating < 1 || rating > 5);
-
-        scanner.nextLine();
-
-        String reviewContent;
-        do {
-            System.out.println("리뷰 내용을 입력해 주세요:");
-            reviewContent = scanner.nextLine();
-            if (reviewContent.trim().isEmpty()) {
-                System.out.println("리뷰 내용이 입력되지 않았습니다. 리뷰 내용을 입력해주세요.");
-            }
-        } while (reviewContent.trim().isEmpty());
-
-        writeReview(orderId, rating, reviewContent);
     }
 
     public ResultSet getUserOrders() {
