@@ -60,7 +60,7 @@ class Main {
 
         switch (option) {
             case 1:
-                customer.searchRestaurantsService(userId);
+                customer.searchRestaurantsService();
                 break;
 
             case 2:
@@ -84,8 +84,9 @@ class Main {
         System.out.println("1. 음식점 정보 등록");
         System.out.println("2. 음식점 정보 업데이트");
         System.out.println("3. 메뉴 관리");
-        System.out.println("4. 조리 완료 업데이트");
+        System.out.println("4. 조리 완료 처리하기");
         System.out.println("5. 주문 이력 조회");
+
 
         Scanner scanner = new Scanner(System.in);
         int option = scanner.nextInt();
@@ -127,8 +128,8 @@ class Main {
 
         System.out.println("배달원님, 환영합니다! 아래 옵션 중 선택해 주세요:");
         System.out.println("1. 배달 요청 확인 및 수락");
-        System.out.println("2. 배달 완료 업데이트");
-        System.out.println("3. 배달 이력 확인");
+        System.out.println("2. 배달 완료 처리하기");
+        System.out.println("3. 완료한 배달 이력 확인");
 
         switch (option) {
             case 1:

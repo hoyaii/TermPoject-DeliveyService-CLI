@@ -32,7 +32,7 @@ public class Customer {
         }
     }
 
-    public void searchRestaurantsService(int userId){ // ********************** 3가지 쿼리 기능 테스트 필요
+    public void searchRestaurantsService(){ // ********************** 3가지 쿼리 기능 테스트 필요
         System.out.println("검색하실 음식점의 이름을 입력해 주세요:");
         String name = scanner.nextLine();
         System.out.println("검색하실 음식점의 위치를 입력해 주세요:");
@@ -41,31 +41,44 @@ public class Customer {
         String type = scanner.nextLine();
 
         ResultSet resultSet = searchRestaurants(name, location, type);
-        HashSet<Integer> restaurantIdList = new HashSet<>();
+        List<Integer> restaurantIdList= printRestaurantList(resultSet);
+
+        System.out.println("메뉴를 확인하고 싶은 음식점의 ID를 입력해주세요.");
+        int restaurantId = scanner.nextInt();
+        scanner.nextLine();
+
+        if (!restaurantIdList.contains(restaurantId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
+            System.out.println("유효하지 않은 음식점 ID입니다.");
+            return;
+        }
+
+        orderService(restaurantId);
+    }
+    
+    public List<Integer> printRestaurantList(ResultSet resultSet){
+        List<Integer> restaurantIdList = new ArrayList<>();
         try {
+            if(resultSet.wasNull()){
+                System.out.println("해당 음식점은 존재하지 않습니다.");
+                return null;
+            }
+
             while (resultSet.next()) {
                 int restaurantId = resultSet.getInt("restaurant_id");
+                String name = resultSet.getString("name");
+                String location = resultSet.getString("location");
+                String type = resultSet.getString("type");
+
+                System.out.println("음식점 ID: " + restaurantId + " 이름: " + name + " 위치: " + location + " 음식 종류: " + type);
+
                 restaurantIdList.add(restaurantId);
-                System.out.println("음식점 ID: " + resultSet.getInt("restaurant_id"));
-                System.out.println("이름: " + resultSet.getString("name"));
-                System.out.println("위치: " + resultSet.getString("location"));
-                System.out.println("음식 종류: " + resultSet.getString("type"));
-                System.out.println();
             }
         } catch (SQLException e) {
             System.out.println("ResultSet에서 읽는 중 에러가 발생했습니다.");
             e.printStackTrace();
         }
 
-        System.out.println("메뉴를 확인하고 싶은 음식점의 ID를 입력해주세요.");
-        int restaurantId = scanner.nextInt();
-        scanner.nextLine();
-
-        if (restaurantIdList.contains(restaurantId)) {
-            orderService(restaurantId);
-        } else {
-            System.out.println("유효하지 않은 음식점 ID입니다.");
-        }
+        return restaurantIdList;
     }
 
     public boolean requestDelivery(int restaurantId, String address){
@@ -170,10 +183,6 @@ public class Customer {
         }
 
         System.out.println("주문이 성공적으로 요청되었습니다.");
-
-        // 음식점 주인이 배달원을 요청하고, 배달원이 승낙하여 매칭되어 배달하고 완료
-        // 레스토랑의 service_area를 바탕으로 해당 지역의 프리한 배달원들의 리스트들을 반환한다.
-        // 배달원은 요청 리스트들 중에서 하나를 승낙한다.
     }
 
     public String getDeliveryStatus(int orderId) {
