@@ -152,24 +152,38 @@ public class Customer {
         }
     }
 
-    public void orderService(int restaurantId){
-        ResultSet menuResultSet = getMenu(restaurantId);
-
+    public List<Integer> printMenuList(ResultSet resultSet){
+        List<Integer> menuIdList = new ArrayList<>();
         try {
-            while (menuResultSet.next()) {
-                System.out.println("메뉴 ID: " + menuResultSet.getInt("menu_id"));
-                System.out.println("메뉴 이름: " + menuResultSet.getString("name"));
-                System.out.println("가격: " + menuResultSet.getDouble("price"));
-                System.out.println();
+            while (resultSet.next()) {
+                int menuId = resultSet.getInt("menu_id");
+                String name = resultSet.getString("name");
+                double price = resultSet.getDouble("price");
+
+                System.out.println("메뉴 ID: " + menuId + " 메뉴 이름: " + name + " 가격: " + price);
+
+                menuIdList.add(menuId);
             }
         } catch (SQLException e) {
             System.out.println("ResultSet에서 읽는 중 에러가 발생했습니다.");
             e.printStackTrace();
         }
 
+        return menuIdList;
+    }
+
+    public void orderService(int restaurantId){
+        ResultSet resultSet = getMenu(restaurantId);
+        List<Integer> menuIdList = printMenuList(resultSet);
+
         System.out.println("주문하실 메뉴의 ID를 입력해 주세요:");
         int menuId = scanner.nextInt();
         scanner.nextLine();
+
+        if (!menuIdList.contains(menuId)) { // 사용자가 주문한 주문 ID 인지 유효성 감사
+            System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
+            return;
+        }
 
         String address = getUserAddress(userId);
         boolean requestSuccess = requestDelivery(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
