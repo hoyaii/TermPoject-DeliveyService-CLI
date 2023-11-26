@@ -38,31 +38,39 @@ public class ServiceProvider {
     }
 
     public String loginService(){
-        String email = null;
-        while (email == null || email.isEmpty() || !isValidEmail(email)) {
+        String email;
+        do {
             System.out.println("이메일을 입력하세요:");
             email = scanner.nextLine();
-            if (email == null || email.isEmpty() || !isValidEmail(email)) {
-                System.out.println("유효한 이메일을 입력해주세요.");
-            }
-        }
 
-        String password = null;
-        while (password == null || password.isEmpty() || !isValidPassword(password)) {
+            if (!isValidEmail(email)) {
+                System.out.println("이메일 형식이 올바르지 않습니다.");
+                email = null;
+            }
+            if (getUserIdByEmail(email) == 0) {
+                System.out.println("가입되지 않은 계정입니다. 회원가입 후 다시 시도해주세요.");
+                email = null;
+            }
+
+        } while (email == null);
+
+        String password;
+        do {
             System.out.println("비밀번호를 입력하세요:");
             password = scanner.nextLine();
-            if (password == null || password.isEmpty() || !isValidPassword(password)) {
-                System.out.println("올바른 비밀번호를 입력해주세요.");
-            }
-        }
 
-        if(login(email, password)){
-            return email;
-        }
-        else{
-            System.out.println("이메일 또는 비밀번호가 잘못되었습니다. 다시 시도해주세요.");
-            return loginService();
-        }
+            if (!isValidPassword(password)) {
+                System.out.println("비밀번호 형식이 올바르지 않습니다.");
+                password = null;
+            }
+            if(!login(email, password)){
+                System.out.println("비밀번호가 잘못되었습니다. 다시 시도해주세요.");
+                password = null;
+            }
+        } while (password == null);
+
+        System.out.println("로그인 성공하였습니다!");
+        return email;
     }
 
     public void registerUser(String email, String username, String password, String role, String phoneNumber, String address) {
