@@ -345,7 +345,7 @@ public class RestaurantOwner {
     }
 
     public ResultSet getRestaurantList() {
-        String sql = "SELECT name FROM Restaurant WHERE owner_id = ?";
+        String sql = "SELECT * FROM Restaurant WHERE owner_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
@@ -477,7 +477,7 @@ public class RestaurantOwner {
     }
 
     public String getMenuName(int menuId) { ////////////////////////// 중복 리팩토링 필요
-        String sql = "SELECT name  FROM Menu WHERE menu_id = ?";
+        String sql = "SELECT name FROM Menu WHERE menu_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, menuId);

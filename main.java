@@ -63,7 +63,7 @@ class Main {
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 4) { // 로그아웃 선택
+            if (option == 4) {
                 break;
             }
 
@@ -103,7 +103,7 @@ class Main {
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 6) { // 로그아웃 선택
+            if (option == 6) {
                 break;
             }
 
@@ -149,7 +149,7 @@ class Main {
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 4) { // 로그아웃 선택
+            if (option == 4) {
                 break;
             }
 
@@ -187,7 +187,7 @@ class Main {
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 4) { // 로그아웃 선택
+            if (option == 4) {
                 break;
             }
 

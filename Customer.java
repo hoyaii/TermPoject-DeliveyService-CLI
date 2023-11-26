@@ -426,19 +426,20 @@ public class Customer {
     }
 
     public String getUserAddress(int userId) {
-        String address = null;
         String sql = "SELECT address FROM User WHERE user_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                address = resultSet.getString("address");
+                return resultSet.getString("address");
+            } else{
+                return null;
             }
         } catch (SQLException e) {
             handleSQLException(e);
+            return null;
         }
-        return address;
     }
 
     private void handleSQLException(SQLException e) {
