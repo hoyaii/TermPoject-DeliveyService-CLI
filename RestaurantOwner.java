@@ -467,12 +467,17 @@ public class RestaurantOwner {
                 String orderStatus = resultSet.getString("status");
                 int menuId = resultSet.getInt("menu_id");
                 Timestamp orderTime = resultSet.getTimestamp("order_time");
+                String comment = getReviewCommentByOrderId(orderId);
 
                 LocalDateTime orderDateTime = orderTime.toLocalDateTime();
                 String formattedOrderTime = orderDateTime.toString();
                 String menuName = getMenuName(menuId);
 
-                System.out.println("주문 ID: " + orderId + "| 메뉴명: "+ menuName + "| 주문 상태: " + orderStatus + "| 주문 시간: " + formattedOrderTime);
+                if(menuName == null){
+                    menuName = "리뷰 없음";
+                }
+
+                System.out.println("주문 ID: " + orderId + "| 메뉴명: "+ menuName + "| 주문 상태: " + orderStatus + "| 주문 시간: " + formattedOrderTime + "| 리뷰: " + comment);
 
                 orderIdList.add(orderId);
             }
@@ -492,6 +497,24 @@ public class RestaurantOwner {
 
             if (resultSet.next()) {
                 return resultSet.getString("name");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
+    public String getReviewCommentByOrderId(int orderId) {
+        String sql = "SELECT comment FROM Review WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("comment");
             } else {
                 return null;
             }
