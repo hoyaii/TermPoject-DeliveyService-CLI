@@ -64,6 +64,7 @@ public class RestaurantOwner {
         List<Integer> restaurantIdList = printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
+            System.out.println("관리하고 있는 식당 목록이 존재하지 않습니다.");
             return;
         }
 
@@ -123,6 +124,7 @@ public class RestaurantOwner {
         List<Integer> restaurantIdList = printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
+            System.out.println("관리하고 있는 식당 목록이 존재하지 않습니다.");
             return;
         }
 
@@ -223,6 +225,7 @@ public class RestaurantOwner {
         List<Integer> restaurantIdList = printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
+            System.out.println("관리하고 있는 식당 목록이 존재하지 않습니다.");
             return;
         }
 
@@ -240,7 +243,8 @@ public class RestaurantOwner {
         ResultSet orderSet= getOrdersByRestaurantId(restaurantId);
         List<Integer> orderIdList = printOrderSet(orderSet); // order 정보들 출력
 
-        if(orderIdList.isEmpty()){ // 식당이 없는 경우
+        if(orderIdList.isEmpty()){ // 주문이 없는 경우
+            System.out.println("주문 내역이 존재하지 않습니다.");
             return;
         }
 
@@ -263,6 +267,7 @@ public class RestaurantOwner {
         List<Integer> restaurantIdList = printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
+            System.out.println("관리하고 있는 식당 목록이 존재하지 않습니다.");
             return;
         }
 
@@ -277,7 +282,12 @@ public class RestaurantOwner {
         } while(!restaurantIdList.contains(restaurantId));
 
         ResultSet orderHistory = getOrderHistory(restaurantId);
-        printOrderSet(orderHistory);
+
+        List<Integer> orderIdList = printOrderSet(orderHistory); // order 정보들 출력
+
+        if(orderIdList.isEmpty()){ // 주문이 없는 경우
+            System.out.println("주문 내역이 존재하지 않습니다.");
+        }
     }
 
     public boolean registerRestaurant(String name, String address, String cuisineType, String serviceArea) {
@@ -367,11 +377,6 @@ public class RestaurantOwner {
     public List<Integer> printRestaurantList(ResultSet resultSet){
         List<Integer> restaurantIdList = new ArrayList<>();
         try {
-            if(resultSet == null){
-                System.out.println("관리하고 있는 식당이 없습니다.");
-                return null;
-            }
-
             while (resultSet.next()) {
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String name = resultSet.getString("name");
@@ -458,11 +463,6 @@ public class RestaurantOwner {
     public List<Integer> printOrderSet(ResultSet resultSet){
         List<Integer> orderIdList = new ArrayList<>();
         try {
-            if(resultSet == null){
-                System.out.println("처리할 주문이 없습니다.");
-                return null;
-            }
-
             while (resultSet.next()) {
                 int orderId = resultSet.getInt("order_id");
                 String orderStatus = resultSet.getString("status");

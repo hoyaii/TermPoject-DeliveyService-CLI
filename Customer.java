@@ -39,6 +39,7 @@ public class Customer {
         List<Integer> restaurantIdList= printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){
+            System.out.println("음식점 목록이 존재하지 않습니다.");
             return;
         }
 
@@ -117,6 +118,7 @@ public class Customer {
         List<Integer> orderIdList = printOrderHistory(resultSet);
 
         if(orderIdList.isEmpty()){
+            System.out.println("주문 내역이 존재하지 않습니다. 주문 후 이용해주세요!");
             return;
         }
 
@@ -141,6 +143,7 @@ public class Customer {
         List<Integer> orderIdList = printOrderHistory(resultSet);
 
         if(orderIdList.isEmpty()){
+            System.out.println("주문 내역이 존재하지 않습니다. 주문 후 이용해주세요!");
             return;
         }
 
@@ -195,11 +198,6 @@ public class Customer {
     public List<Integer> printRestaurantList(ResultSet resultSet){
         List<Integer> restaurantIdList = new ArrayList<>();
         try {
-            if(resultSet == null){
-                System.out.println("해당 음식점은 존재하지 않습니다.");
-                return null;
-            }
-
             while (resultSet.next()) {
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String name = resultSet.getString("name");
@@ -269,11 +267,6 @@ public class Customer {
     public List<Integer> printMenuList(ResultSet resultSet){
         List<Integer> menuIdList = new ArrayList<>();
         try {
-            if(resultSet == null){
-                System.out.println("메뉴가 없습니다.");
-                return null;
-            }
-
             while (resultSet.next()) {
                 int menuId = resultSet.getInt("menu_id");
                 String name = resultSet.getString("name");
@@ -311,11 +304,6 @@ public class Customer {
         List<Integer> orderIdList = new ArrayList<>();
 
         try {
-            if(resultSet == null){
-                System.out.println("주문이 없습니다.");
-                return null;
-            }
-
             while (resultSet.next()) {
                 int orderId = resultSet.getInt("order_id ");
                 String menuName = getMenuNamByOrderId(orderId);

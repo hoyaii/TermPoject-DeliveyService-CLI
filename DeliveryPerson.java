@@ -21,10 +21,10 @@ public class DeliveryPerson {
     public void manageDeliveryRequestService(){ //  배달원이 요청 리스트를 보고 승낙하여 매칭
         ResultSet resultSet = getDeliveryList("notAccepted");
 
-        List<Integer> deliveryIdList = printDeliveryList(resultSet);
+        List<Integer> deliveryIdList = getDeliveryList(resultSet);
 
         if(deliveryIdList.isEmpty()){
-            System.out.println("들어온 요청이 존재하지 않습니다!");
+            System.out.println("배달 요청이 존재하지 않습니다!");
             return;
         }
 
@@ -49,10 +49,10 @@ public class DeliveryPerson {
 
     public void finishDeliveryService(){
         ResultSet resultSet = getDeliveryList("accepted");
-        List<Integer> deliveryIdList = printDeliveryList(resultSet);
+        List<Integer> deliveryIdList = getDeliveryList(resultSet);
 
         if(deliveryIdList.isEmpty()){
-            System.out.println("완료한 배달 내역이 존재하지 않습니다!");
+            System.out.println("배달 내역이 존재하지 않습니다.");
             return;
         }
 
@@ -124,14 +124,9 @@ public class DeliveryPerson {
         }
     }
 
-    public List<Integer> printDeliveryList(ResultSet resultSet){
+    public List<Integer> getDeliveryList(ResultSet resultSet){
         List<Integer> deliveryIdList = new ArrayList<>();
         try {
-            if(resultSet == null){
-                System.out.println("배달 내역이 없습니다.");
-                return null;
-            }
-
             while (resultSet.next()) {
                 int deliveryId = resultSet.getInt("delivery_id ");
                 int restaurantId = resultSet.getInt("restaurant_id");
