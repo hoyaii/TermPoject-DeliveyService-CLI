@@ -14,7 +14,7 @@ public class Customer {
         this.userId = userId;
     }
 
-    public void searchRestaurantsService(){ // ********************** 3가지 쿼리 기능 테스트 필요
+    public void searchRestaurantsService(){ // ***************** 3가지 쿼리 기능 테스트 필요
         String serviceArea;
         do {
             System.out.println("검색하실 음식점의 지역을 입력해 주세요:");
@@ -111,7 +111,7 @@ public class Customer {
     }
 
     public void getDeliveryStatusService(){
-        ResultSet resultSet = getUserOrders();
+        ResultSet resultSet = getUserOrders("");
         List<Integer> orderIdList = printOrderHistory(resultSet);
 
         if(orderIdList.isEmpty()){
@@ -136,7 +136,7 @@ public class Customer {
     }
 
     public void writeReviewService(){
-        ResultSet resultSet = getUserOrders();
+        ResultSet resultSet = getUserOrders("finished");
         List<Integer> orderIdList = printOrderHistory(resultSet);
 
         if(orderIdList.isEmpty()){
@@ -201,7 +201,7 @@ public class Customer {
                 String location = resultSet.getString("service_area");
                 String type = resultSet.getString("cuisine_type");
 
-                System.out.println("음식점 ID: " + restaurantId + ", 이름: " + name + ", 위치: " + location + ", 음식 종류: " + type);
+                System.out.println("음식점 ID: " + restaurantId + "| 이름: " + name + "| 위치: " + location + "| 음식 종류: " + type);
 
                 restaurantIdList.add(restaurantId);
             }
@@ -277,7 +277,7 @@ public class Customer {
                 String name = resultSet.getString("name");
                 double price = resultSet.getDouble("price");
 
-                System.out.println("메뉴 ID: " + menuId + ", 메뉴 이름: " + name + ", 가격: " + price);
+                System.out.println("메뉴 ID: " + menuId + "| 메뉴 이름: " + name + "| 가격: " + price);
 
                 menuIdList.add(menuId);
             }
@@ -317,7 +317,7 @@ public class Customer {
                 LocalDateTime orderDateTime = orderTime.toLocalDateTime();
                 String formattedOrderTime = orderDateTime.toString();
 
-                System.out.println("주문 ID: " + orderId + ", 메뉴명: " + menuName + ", 주문 시간: " + formattedOrderTime);
+                System.out.println("주문 ID: " + orderId + "| 메뉴명: " + menuName + "| 주문 시간: " + formattedOrderTime);
 
                 orderIdList.add(orderId);
             }
@@ -347,11 +347,12 @@ public class Customer {
         }
     }
 
-    public ResultSet getUserOrders() {
-        String sql = "SELECT * FROM Orders WHERE customer_id = ?";
+    public ResultSet getUserOrders(String status) {
+        String sql = "SELECT * FROM Orders WHERE customer_id = ? AND status LIKE ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, userId);
+            preparedStatement.setString(2, "%" + status + "%");
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
             handleSQLException(e);

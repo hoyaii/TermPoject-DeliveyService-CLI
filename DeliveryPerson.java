@@ -111,7 +111,7 @@ public class DeliveryPerson {
         String menuName = getMenuName(menuId);
         String restaurantName = getRestaurantName(restaurantId);
         String deliveryAddress = getDeliveryAddress(orderId);
-        System.out.println("주문 ID: " + orderId + ", 가게 이름: " + restaurantName + ", 메뉴 이름: " + menuName + ", 주문 시간: " + formattedOrderTime + ", 배달 주소: " + deliveryAddress);
+        System.out.println("주문 ID: " + orderId + "| 가게 이름: " + restaurantName + "| 메뉴 이름: " + menuName + "| 주문 시간: " + formattedOrderTime + "| 배달 주소: " + deliveryAddress);
     }
 
     public ResultSet getDeliveryList(String status){
@@ -151,7 +151,7 @@ public class DeliveryPerson {
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String deliveryAddress = resultSet.getString("delivery_address");
                 String restaurantAddress = getRestaurantAddress(restaurantId);
-                System.out.println("id: " + deliveryId + ", 가게 주소: " + restaurantAddress + ", 배달할 주소: " + deliveryAddress);
+                System.out.println("id: " + deliveryId + "| 가게 주소: " + restaurantAddress + "| 배달할 주소: " + deliveryAddress);
 
                 deliveryIdList.add(deliveryId);
             }

@@ -96,7 +96,7 @@ class Main {
             System.out.println("2. 음식점 정보 업데이트");
             System.out.println("3. 메뉴 관리");
             System.out.println("4. 조리 완료 처리하기");
-            System.out.println("5. 주문 이력 조회");
+            System.out.println("5. 주문 내역과 상태 조회");
             System.out.println("6. 로그아웃");
 
             Scanner scanner = new Scanner(System.in);

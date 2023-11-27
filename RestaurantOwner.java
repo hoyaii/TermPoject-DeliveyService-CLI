@@ -282,7 +282,6 @@ public class RestaurantOwner {
         } while(!restaurantIdList.contains(restaurantId));
 
         ResultSet orderHistory = getOrderHistory(restaurantId);
-
         List<Integer> orderIdList = printOrderSet(orderHistory); // order 정보들 출력
 
         if(orderIdList.isEmpty()){ // 주문이 없는 경우
@@ -473,7 +472,7 @@ public class RestaurantOwner {
                 String formattedOrderTime = orderDateTime.toString();
                 String menuName = getMenuName(menuId);
 
-                System.out.println("주문 ID: " + orderId + ", 메뉴명: "+ menuName + ", 주문 상태: " + orderStatus + ", 주문 시간: " + formattedOrderTime);
+                System.out.println("주문 ID: " + orderId + "| 메뉴명: "+ menuName + "| 주문 상태: " + orderStatus + "| 주문 시간: " + formattedOrderTime);
 
                 orderIdList.add(orderId);
             }
