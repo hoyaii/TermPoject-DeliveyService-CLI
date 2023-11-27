@@ -394,14 +394,14 @@ public class Customer {
 
     public List<Integer> getAvailableDeliveryPeople(String serviceArea) {
         List<Integer> availableDeliveryPersons = new ArrayList<>();
-        String sql = "SELECT user_id FROM User WHERE service_area = ? AND status = 'Free'";
+        String sql = "SELECT user_id FROM User WHERE service_area = ? AND status = 'free'";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, serviceArea);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                availableDeliveryPersons.add(resultSet.getInt("delivery_person_id"));
+                availableDeliveryPersons.add(resultSet.getInt("user_id"));
             }
         } catch (SQLException e) {
             handleSQLException(e);

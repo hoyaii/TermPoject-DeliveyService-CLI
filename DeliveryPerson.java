@@ -20,11 +20,10 @@ public class DeliveryPerson {
 
     public void manageDeliveryRequestService(){ //  배달원이 요청 리스트를 보고 승낙하여 매칭
         ResultSet resultSet = getDeliveryList("notAccepted");
-
-        List<Integer> deliveryIdList = getDeliveryList(resultSet);
+        List<Integer> deliveryIdList = printDeliveryList(resultSet);
 
         if(deliveryIdList.isEmpty()){
-            System.out.println("배달 요청이 존재하지 않습니다!");
+            System.out.println("배달 요청이 존재하지 않습니다.");
             return;
         }
 
@@ -49,7 +48,7 @@ public class DeliveryPerson {
 
     public void finishDeliveryService(){
         ResultSet resultSet = getDeliveryList("accepted");
-        List<Integer> deliveryIdList = getDeliveryList(resultSet);
+        List<Integer> deliveryIdList = printDeliveryList(resultSet);
 
         if(deliveryIdList.isEmpty()){
             System.out.println("배달 내역이 존재하지 않습니다.");
@@ -124,7 +123,22 @@ public class DeliveryPerson {
         }
     }
 
-    public List<Integer> getDeliveryList(ResultSet resultSet){
+    public List<Integer> getDeliveryIdList() throws SQLException {
+        String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ?";
+        List<Integer> deliveryIdList = new ArrayList<>();
+
+        PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+        preparedStatement.setInt(1, userId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while(resultSet.next()){
+            deliveryIdList.add(resultSet.getInt("delivery_id"));
+        }
+
+        return deliveryIdList;
+    }
+
+    public List<Integer> printDeliveryList(ResultSet resultSet){
         List<Integer> deliveryIdList = new ArrayList<>();
         try {
             while (resultSet.next()) {
@@ -280,21 +294,6 @@ public class DeliveryPerson {
             handleSQLException(e);
             return null;
         }
-    }
-
-    public List<Integer> getDeliveryIdList() throws SQLException {
-        String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ?";
-        List<Integer> deliveryIdList = new ArrayList<>();
-
-        PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-        preparedStatement.setInt(1, userId);
-        ResultSet resultSet = preparedStatement.executeQuery();
-
-        while(resultSet.next()){
-            deliveryIdList.add(resultSet.getInt("delivery_id"));
-        }
-
-        return deliveryIdList;
     }
 
     private void handleSQLException(SQLException e) {
