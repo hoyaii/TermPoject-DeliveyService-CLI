@@ -262,7 +262,7 @@ public class RestaurantOwner {
         updateOrderStatus(orderId, "cooked");
     }
 
-    public void getOrderHistoryService(){
+    public void printOrderHistoryService(){
         ResultSet resultSet = getRestaurantList();
         List<Integer> restaurantIdList = printRestaurantList(resultSet);
 
@@ -283,6 +283,33 @@ public class RestaurantOwner {
 
         ResultSet orderHistory = getOrderHistory(restaurantId);
         List<Integer> orderIdList = printOrderSet(orderHistory); // order 정보들 출력
+
+        if(orderIdList.isEmpty()){ // 주문이 없는 경우
+            System.out.println("주문 내역이 존재하지 않습니다.");
+        }
+    }
+
+    public void printReviewService(){
+        ResultSet resultSet = getRestaurantList();
+        List<Integer> restaurantIdList = printRestaurantList(resultSet);
+
+        if(restaurantIdList.isEmpty()){ // 식당이 없는 경우
+            System.out.println("관리하고 있는 식당 목록이 존재하지 않습니다.");
+            return;
+        }
+
+        Integer restaurantId;
+        do {
+            System.out.println("리뷰를 조회할 음식점의 ID을 입력해 주세요:");
+            restaurantId = scanner.nextInt();
+
+            if(!restaurantIdList.contains(restaurantId)){
+                System.out.println("선택하신 식당 ID는 유효하지 않습니다.");
+            }
+        } while(!restaurantIdList.contains(restaurantId));
+
+        ResultSet orderHistory = getOrderHistory(restaurantId);
+        List<Integer> orderIdList = printReviewSet(orderHistory);
 
         if(orderIdList.isEmpty()){ // 주문이 없는 경우
             System.out.println("주문 내역이 존재하지 않습니다.");
@@ -459,6 +486,31 @@ public class RestaurantOwner {
         }
     }
 
+    public List<Integer> printReviewSet(ResultSet resultSet){
+        List<Integer> orderIdList = new ArrayList<>();
+        try {
+            while (resultSet.next()) {
+                int orderId = resultSet.getInt("order_id");
+                int menuId = resultSet.getInt("menu_id");
+                String comment = getReviewCommentByOrderId(orderId);
+
+                String menuName = getMenuName(menuId);
+
+                if(comment == null){
+                    continue;
+                }
+
+                System.out.println("주문 ID: " + orderId + "| 메뉴명: "+ menuName +  "| 리뷰: " + comment);
+
+                orderIdList.add(orderId);
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+
+        return orderIdList;
+    }
+
     public List<Integer> printOrderSet(ResultSet resultSet){
         List<Integer> orderIdList = new ArrayList<>();
         try {
@@ -467,17 +519,12 @@ public class RestaurantOwner {
                 String orderStatus = resultSet.getString("status");
                 int menuId = resultSet.getInt("menu_id");
                 Timestamp orderTime = resultSet.getTimestamp("order_time");
-                String comment = getReviewCommentByOrderId(orderId);
 
                 LocalDateTime orderDateTime = orderTime.toLocalDateTime();
                 String formattedOrderTime = orderDateTime.toString();
                 String menuName = getMenuName(menuId);
 
-                if(menuName == null){
-                    menuName = "리뷰 없음";
-                }
-
-                System.out.println("주문 ID: " + orderId + "| 메뉴명: "+ menuName + "| 주문 상태: " + orderStatus + "| 주문 시간: " + formattedOrderTime + "| 리뷰: " + comment);
+                System.out.println("주문 ID: " + orderId + "| 메뉴명: " + menuName + "| 주문 상태: " + orderStatus + "| 주문 시간: " + formattedOrderTime);
 
                 orderIdList.add(orderId);
             }

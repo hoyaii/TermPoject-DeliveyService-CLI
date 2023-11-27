@@ -97,13 +97,14 @@ class Main {
             System.out.println("3. 메뉴 관리");
             System.out.println("4. 조리 완료 처리하기");
             System.out.println("5. 주문 내역과 상태 조회");
-            System.out.println("6. 로그아웃");
+            System.out.println("6. 리뷰 확인");
+            System.out.println("7. 로그아웃");
 
             Scanner scanner = new Scanner(System.in);
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 6) {
+            if (option == 7) {
                 break;
             }
 
@@ -125,7 +126,11 @@ class Main {
                     break;
 
                 case 5:
-                    restaurantOwner.getOrderHistoryService();
+                    restaurantOwner.printOrderHistoryService();
+                    break;
+
+                case 6:
+                    restaurantOwner.printReviewService();
                     break;
 
                 default:

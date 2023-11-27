@@ -329,7 +329,7 @@ public class Customer {
     }
 
     public void createReview(int orderId, int customerId, int rating, String comment) {
-        String sql = "INSERT INTO Review (order_id, customer_id, rating, content) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Review (order_id, customer_id, rating, comment) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, orderId);
