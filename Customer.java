@@ -175,7 +175,9 @@ public class Customer {
             }
         } while (reviewContent.trim().isEmpty());
 
-        createReview(orderId, rating, reviewContent);
+        int menuId = getMenuIdByOrderId(orderId);
+
+        createReview(orderId, rating, reviewContent, menuId);
     }
 
     public ResultSet getRestaurants(String name, String serviceArea, String cuisineType) {
@@ -289,13 +291,13 @@ public class Customer {
     }
 
     public String getDeliveryStatus(int orderId) {
-        String sql = "SELECT order_status FROM Orders WHERE order_id = ?";
+        String sql = "SELECT status FROM Orders WHERE order_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, orderId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getString("order_status");
+                return resultSet.getString("status");
             } else {
                 return null;
             }
@@ -310,7 +312,7 @@ public class Customer {
 
         try {
             while (resultSet.next()) {
-                int orderId = resultSet.getInt("order_id ");
+                int orderId = resultSet.getInt("order_id");
                 String menuName = getMenuNamByOrderId(orderId);
                 Timestamp orderTime = resultSet.getTimestamp("order_time");
 
@@ -328,13 +330,14 @@ public class Customer {
         return orderIdList;
     }
 
-    public void createReview(int orderId, int rating, String reviewContent) {
-        String sql = "INSERT INTO Reviews (order_id, rating, content) VALUES (?, ?, ?)";
+    public void createReview(int orderId, int rating, String reviewContent, int menuId) {
+        String sql = "INSERT INTO Review (order_id, rating, content, menu_id) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, orderId);
             preparedStatement.setInt(2, rating);
             preparedStatement.setString(3, reviewContent);
+            preparedStatement.setInt(4, menuId);
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
@@ -447,6 +450,24 @@ public class Customer {
         } catch (SQLException e) {
             handleSQLException(e);
             return null;
+        }
+    }
+
+    public int getMenuIdByOrderId(int orderId) {
+        String sql = "SELECT menu_id FROM Orders WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getInt("menu_id");
+            } else {
+                return 0;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return 0;
         }
     }
 
