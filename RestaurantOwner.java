@@ -205,6 +205,8 @@ public class RestaurantOwner {
                 }
 
                 updateMenu(menuId, newName, newPrice);
+                System.out.println("메뉴 수정이 성공적으로 수행되었습니다!");
+
                 break;
 
             case 3:
@@ -215,6 +217,8 @@ public class RestaurantOwner {
                     System.out.println("등록되어 있는 메뉴가 존재하지 않습니다.");
                     return;
                 }
+
+                System.out.println("메뉴를 삭제하면 주문 내역이 모두 삭제되니 주의해주세요.");
 
                 do {
                     System.out.println("삭제할 메뉴의 ID를 입력해 주세요:");
@@ -227,6 +231,8 @@ public class RestaurantOwner {
                 } while(!menuIdList.contains(menuId));
 
                 deleteMenu(menuId);
+                System.out.println("메뉴 삭제가 성공적으로 수행되었습니다!");
+
                 break;
 
             default:
@@ -392,7 +398,43 @@ public class RestaurantOwner {
         }
     }
 
+    public void deleteReviewsWithOrder(int orderId) {
+        String sql = "DELETE FROM Review WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public void deleteOrdersWithMenu(int menuId) {
+        String sql = "SELECT order_id FROM Orders WHERE menu_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, menuId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while(resultSet.next()) {
+                int orderId = resultSet.getInt("order_id");
+                // 해당 주문을 참조하는 'Review' 테이블의 레코드를 삭제한다.
+                deleteReviewsWithOrder(orderId);
+            }
+
+            sql = "DELETE FROM Orders WHERE menu_id = ?";
+            preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, menuId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
     public void deleteMenu(int menuId) {
+        // 먼저, 해당 메뉴를 참조하는 'Orders' 테이블의 레코드를 삭제한다
+        deleteOrdersWithMenu(menuId);
+
         String sql = "DELETE FROM Menu WHERE menu_id = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
