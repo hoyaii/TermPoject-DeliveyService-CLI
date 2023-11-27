@@ -97,7 +97,7 @@ public class DeliveryPerson {
     public void printSingleDeliveryHistory(int deliveryId) throws SQLException {
         ResultSet resultSet = getDeliveryHistory(deliveryId);
 
-        if(resultSet.wasNull()){
+        if(resultSet == null || !resultSet.next()){
             return;
         }
 
