@@ -166,18 +166,16 @@ public class Customer {
 
         scanner.nextLine();
 
-        String reviewContent;
+        String comment;
         do {
             System.out.println("리뷰 내용을 입력해 주세요:");
-            reviewContent = scanner.nextLine();
-            if (reviewContent.trim().isEmpty()) {
+            comment = scanner.nextLine();
+            if (comment.trim().isEmpty()) {
                 System.out.println("리뷰 내용이 입력되지 않았습니다. 리뷰 내용을 입력해주세요.");
             }
-        } while (reviewContent.trim().isEmpty());
+        } while (comment.trim().isEmpty());
 
-        int menuId = getMenuIdByOrderId(orderId);
-
-        createReview(orderId, rating, reviewContent, menuId);
+        createReview(orderId, userId, rating, comment);
     }
 
     public ResultSet getRestaurants(String name, String serviceArea, String cuisineType) {
@@ -330,14 +328,14 @@ public class Customer {
         return orderIdList;
     }
 
-    public void createReview(int orderId, int rating, String reviewContent, int menuId) {
-        String sql = "INSERT INTO Review (order_id, rating, content, menu_id) VALUES (?, ?, ?, ?)";
+    public void createReview(int orderId, int customerId, int rating, String comment) {
+        String sql = "INSERT INTO Review (order_id, customer_id, rating, content) VALUES (?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, orderId);
-            preparedStatement.setInt(2, rating);
-            preparedStatement.setString(3, reviewContent);
-            preparedStatement.setInt(4, menuId);
+            preparedStatement.setInt(2, customerId);
+            preparedStatement.setInt(3, rating);
+            preparedStatement.setString(4, comment);
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {
@@ -372,26 +370,6 @@ public class Customer {
 
             if (resultSet.next()) {
                 return resultSet.getString("name");
-            } else {
-                return null;
-            }
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return null;
-        }
-    }
-
-    public String getOrderTime(int orderId) {
-        String sql = "SELECT order_time FROM Orders WHERE order_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, orderId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                Timestamp timestamp = resultSet.getTimestamp("order_time");
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                return sdf.format(timestamp);
             } else {
                 return null;
             }
@@ -450,24 +428,6 @@ public class Customer {
         } catch (SQLException e) {
             handleSQLException(e);
             return null;
-        }
-    }
-
-    public int getMenuIdByOrderId(int orderId) {
-        String sql = "SELECT menu_id FROM Orders WHERE order_id = ?";
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, orderId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                return resultSet.getInt("menu_id");
-            } else {
-                return 0;
-            }
-        } catch (SQLException e) {
-            handleSQLException(e);
-            return 0;
         }
     }
 
