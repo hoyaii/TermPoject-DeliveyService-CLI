@@ -1,7 +1,4 @@
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -215,19 +212,26 @@ public class Customer {
         return restaurantIdList;
     }
 
-    public void createDelivery(int restaurantId, String address, int deliveryPersonId) {
+    public int createDelivery(int restaurantId, String address, int deliveryPersonId) {
         String sql = "INSERT INTO Delivery (restaurant_id, delivery_address, delivery_person_id, status) VALUES (?, ?, ?, ?)";
         String status = "notAccepted";
+        int deliveryId = 0;
         try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1, restaurantId);
             preparedStatement.setString(2, address);
             preparedStatement.setInt(3, deliveryPersonId);
             preparedStatement.setString(4, status);
             preparedStatement.executeUpdate();
+
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                deliveryId = generatedKeys.getInt(1);
+            }
         } catch (SQLException e) {
             handleSQLException(e);
         }
+        return deliveryId;
     }
 
     public ResultSet getMenu(int restaurantId) {

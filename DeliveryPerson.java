@@ -123,7 +123,7 @@ public class DeliveryPerson {
         }
     }
 
-    public List<Integer> getDeliveryIdList() throws SQLException {
+    public List<Integer> getDeliveryIdList() throws SQLException {///////////////////////////// 아래꺼랑 리팩토링
         String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ?";
         List<Integer> deliveryIdList = new ArrayList<>();
 
@@ -142,7 +142,7 @@ public class DeliveryPerson {
         List<Integer> deliveryIdList = new ArrayList<>();
         try {
             while (resultSet.next()) {
-                int deliveryId = resultSet.getInt("delivery_id ");
+                int deliveryId = resultSet.getInt("delivery_id");
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String deliveryAddress = resultSet.getString("delivery_address");
                 String restaurantAddress = getRestaurantAddress(restaurantId);
