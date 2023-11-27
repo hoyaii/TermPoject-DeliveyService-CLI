@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Customer {
     private Database db;
-    private Scanner scanner;
+    private Scanner           scanner;
     private int userId;
 
     public Customer(Database db, int userId) {
@@ -18,14 +18,24 @@ public class Customer {
     }
 
     public void searchRestaurantsService(){ // ********************** 3가지 쿼리 기능 테스트 필요
-        System.out.println("검색하실 음식점의 이름을 입력해 주세요:");
-        String name = scanner.nextLine();
-        System.out.println("검색하실 음식점의 위치를 입력해 주세요:");
-        String location = scanner.nextLine();
-        System.out.println("검색하실 음식점의 음식 종류를 입력해 주세요:");
+        String serviceArea;
+        do {
+            System.out.println("검색하실 음식점의 지역을 입력해 주세요:");
+            serviceArea = scanner.nextLine();
+
+            if (!serviceArea.equals("서울") && !serviceArea.equals("부산") && !serviceArea.equals("대구") && !serviceArea.equals("대전") && !serviceArea.equals("광주") && !serviceArea.equals("울산")) {
+                System.out.println("배달 서비스는 '서울', '부산', '대구', '대전', '광주', '울산'에서만 제공합니다. 다시 작성해주세요.");
+                serviceArea = null;
+            }
+        } while (serviceArea == null);
+
+        System.out.println("검색하실 음식점의 음식 종류를 입력해 주세요: (옵션)");
         String type = scanner.nextLine();
 
-        ResultSet resultSet = getRestaurants(name, location, type);
+        System.out.println("검색하실 음식점의 이름을 입력해 주세요: (옵션)");
+        String name = scanner.nextLine();
+
+        ResultSet resultSet = getRestaurants(name, serviceArea, type);
         List<Integer> restaurantIdList= printRestaurantList(resultSet);
 
         if(restaurantIdList.isEmpty()){
@@ -165,13 +175,13 @@ public class Customer {
         createReview(orderId, rating, reviewContent);
     }
 
-    public ResultSet getRestaurants(String name, String location, String type) {
+    public ResultSet getRestaurants(String name, String serviceArea, String cuisineType) {
         String sql = "SELECT * FROM Restaurant WHERE name LIKE ? AND service_area  LIKE ? AND cuisine_type LIKE ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, "%" + name + "%");
-            preparedStatement.setString(2, "%" + location + "%");
-            preparedStatement.setString(3, "%" + type + "%");
+            preparedStatement.setString(2, "%" + serviceArea + "%");
+            preparedStatement.setString(3, "%" + cuisineType + "%");
             return preparedStatement.executeQuery();
         } catch (SQLException e) {
             handleSQLException(e);
@@ -190,8 +200,8 @@ public class Customer {
             while (resultSet.next()) {
                 int restaurantId = resultSet.getInt("restaurant_id");
                 String name = resultSet.getString("name");
-                String location = resultSet.getString("location");
-                String type = resultSet.getString("type");
+                String location = resultSet.getString("service_area");
+                String type = resultSet.getString("cuisine_type");
 
                 System.out.println("음식점 ID: " + restaurantId + ", 이름: " + name + ", 위치: " + location + ", 음식 종류: " + type);
 

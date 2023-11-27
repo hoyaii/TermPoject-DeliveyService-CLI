@@ -24,6 +24,7 @@ public class DeliveryPerson {
         List<Integer> deliveryIdList = printDeliveryList(resultSet);
 
         if(deliveryIdList.isEmpty()){
+            System.out.println("들어온 요청이 존재하지 않습니다!");
             return;
         }
 
@@ -51,6 +52,7 @@ public class DeliveryPerson {
         List<Integer> deliveryIdList = printDeliveryList(resultSet);
 
         if(deliveryIdList.isEmpty()){
+            System.out.println("완료한 배달 내역이 존재하지 않습니다!");
             return;
         }
 
@@ -80,9 +82,14 @@ public class DeliveryPerson {
 
             System.out.println("지금까지 " + deliveryIdList.size() + " 번 배달을 완료하셨습니다!");
 
+            if(deliveryIdList.isEmpty()){
+                System.out.println("배달 내역이 존재하지 않습니다.");
+            }
+
             for (int deliveryId : deliveryIdList) {
                 printSingleDeliveryHistory(deliveryId);
             }
+
         } catch (SQLException e) {
             handleSQLException(e);
         }
@@ -90,11 +97,6 @@ public class DeliveryPerson {
 
     public void printSingleDeliveryHistory(int deliveryId) throws SQLException {
         ResultSet resultSet = getDeliveryHistory(deliveryId);
-
-        if (resultSet == null) {
-            System.out.println("배달 이력이 없습니다.");
-            return;
-        }
 
         int orderId = resultSet.getInt("order_id");
         int menuId = resultSet.getInt("menu_id");
@@ -285,37 +287,16 @@ public class DeliveryPerson {
         }
     }
 
-    public int getDeliveryCountByUserId(int userId){
-        try {
-            String query = "SELECT COUNT(*) AS count FROM Delivery WHERE delivery_person_id = ?";
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(query);
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if(resultSet.next()){
-                return resultSet.getInt("count");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return 0;  // SQL 오류가 발생하거나, 해당하는 레코드가 없는 경우
-    }
-
-    public List<Integer> getDeliveryIdList() {
+    public List<Integer> getDeliveryIdList() throws SQLException {
         String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ?";
         List<Integer> deliveryIdList = new ArrayList<>();
-        try {
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            while(resultSet.next()){
-                int deliveryId = resultSet.getInt("delivery_id ");
-                deliveryIdList.add(deliveryId);
-            }
+        PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+        preparedStatement.setInt(1, userId);
+        ResultSet resultSet = preparedStatement.executeQuery();
 
-        } catch (SQLException e) {
-            handleSQLException(e);
+        while(resultSet.next()){
+            deliveryIdList.add(resultSet.getInt("delivery_id"));
         }
 
         return deliveryIdList;
