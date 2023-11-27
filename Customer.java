@@ -76,13 +76,13 @@ public class Customer {
 
         String address = getUserAddress(userId);
 
-        boolean requestSuccess = requestDeliveryService(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
-        if (!requestSuccess) {
+        int deliveryId = requestDeliveryService(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
+        if (deliveryId == 0) {
             System.out.println("주문에 실패하였습니다.");
             return;
         }
 
-        boolean orderSuccess = createOrder(restaurantId, menuId); // 주문 생성
+        boolean orderSuccess = createOrder(deliveryId, restaurantId, menuId); // 주문 생성
         if (!orderSuccess) {
             System.out.println("주문에 실패하였습니다.");
             return;
@@ -91,23 +91,23 @@ public class Customer {
         System.out.println("주문이 성공적으로 요청되었습니다.");
     }
 
-    public boolean requestDeliveryService(int restaurantId, String address){
+    public int requestDeliveryService(int restaurantId, String address){
         String serviceArea = getServiceArea(restaurantId);
 
         List<Integer> availableDeliveryPersons = getAvailableDeliveryPeople(serviceArea);
 
         if(availableDeliveryPersons.isEmpty()){
             System.out.println("배달 가능한 배달원이 존재하지 않습니다.");
-            return false;
+            return 0;
         }
 
         Random rand = new Random(); // 가능한 기사중 아무나 한명을 선택한다
         int randomIndex = rand.nextInt(availableDeliveryPersons.size());
         Integer selectedDeliveryPersonId = availableDeliveryPersons.get(randomIndex);
 
-        createDelivery(restaurantId, address, selectedDeliveryPersonId);
+        int deliveryId = createDelivery(restaurantId, address, selectedDeliveryPersonId);
 
-        return true;
+        return deliveryId;
     }
 
     public void getDeliveryStatusService(){
@@ -246,19 +246,20 @@ public class Customer {
         }
     }
 
-    public boolean createOrder(int restaurantId, int menuId) {
-        String sql = "INSERT INTO Orders (restaurant_id, menu_id, customer_id, status, order_time) VALUES (?, ?, ?, ?, ?)";
+    public boolean createOrder(int deliveryId, int restaurantId, int menuId) {
+        String sql = "INSERT INTO Orders (delivery_id, restaurant_id, menu_id, customer_id, status, order_time) VALUES (?, ?, ?, ?, ?, ?)";
 
         // order_time 구하기
         LocalDateTime currentTime = LocalDateTime.now();
         Timestamp timestamp = Timestamp.valueOf(currentTime);
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, restaurantId);
-            preparedStatement.setInt(2, menuId);
-            preparedStatement.setInt(3, userId);
-            preparedStatement.setString(4, "notMatched");
-            preparedStatement.setTimestamp(5, timestamp);
+            preparedStatement.setInt(1, deliveryId);
+            preparedStatement.setInt(2, restaurantId);
+            preparedStatement.setInt(3, menuId);
+            preparedStatement.setInt(4, userId);
+            preparedStatement.setString(5, "notMatched");
+            preparedStatement.setTimestamp(6, timestamp);
 
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;

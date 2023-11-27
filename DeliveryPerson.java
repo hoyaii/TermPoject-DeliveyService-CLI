@@ -38,7 +38,7 @@ public class DeliveryPerson {
             }
         } while(!deliveryIdList.contains(deliveryId));
 
-        Integer orderId = getOrderIdByDeliveryId(deliveryId);
+        Integer orderId = getOrderIdByDeliveryId(deliveryId, "notMatched");
 
         updateDeliveryStatus("accepted", deliveryId);
         updateOrderStatus("deliveryMatched", orderId);
@@ -66,7 +66,7 @@ public class DeliveryPerson {
             }
         } while(!deliveryIdList.contains(deliveryId));
 
-        Integer orderId = getOrderIdByDeliveryId(deliveryId); // deliveryId를 가지고 orderId를 구한다
+        Integer orderId = getOrderIdByDeliveryId(deliveryId, "cooked"); // deliveryId를 가지고 orderId를 구한다
 
         updateDeliveryStatus("finished", deliveryId);
         updateOrderStatus("finished", orderId);
@@ -242,11 +242,12 @@ public class DeliveryPerson {
         }
     }
 
-    public Integer getOrderIdByDeliveryId(int deliveryId) {
-        String sql = "SELECT order_id FROM Orders WHERE delivery_id = ?";
+    public Integer getOrderIdByDeliveryId(int deliveryId, String status) {
+        String sql = "SELECT order_id FROM Orders WHERE delivery_id = ? AND status = ?";
         try {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, deliveryId);
+            preparedStatement.setString(2, status);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getInt("order_id");
