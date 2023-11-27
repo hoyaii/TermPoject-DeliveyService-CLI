@@ -254,10 +254,10 @@ public class RestaurantOwner {
             orderId = scanner.nextInt();
             scanner.nextLine();
 
-            if(!restaurantIdList.contains(orderId)){
+            if(!orderIdList.contains(orderId)){
                 System.out.println("선택하신 주문 ID는 유효하지 않습니다.");
             }
-        } while(!restaurantIdList.contains(orderId));
+        } while(!orderIdList.contains(orderId));
 
         updateOrderStatus(orderId, "cooked");
     }

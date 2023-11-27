@@ -77,7 +77,7 @@ public class DeliveryPerson {
 
     public void printDeliveryHistoryService() {
         try {
-            List<Integer> deliveryIdList = getDeliveryIdList();
+            List<Integer> deliveryIdList = getDeliveryIdList("finished");
 
             System.out.println("지금까지 " + deliveryIdList.size() + " 번 배달을 완료하셨습니다!");
 
@@ -96,6 +96,10 @@ public class DeliveryPerson {
 
     public void printSingleDeliveryHistory(int deliveryId) throws SQLException {
         ResultSet resultSet = getDeliveryHistory(deliveryId);
+
+        if(resultSet.wasNull()){
+            return;
+        }
 
         int orderId = resultSet.getInt("order_id");
         int menuId = resultSet.getInt("menu_id");
@@ -123,12 +127,13 @@ public class DeliveryPerson {
         }
     }
 
-    public List<Integer> getDeliveryIdList() throws SQLException {///////////////////////////// 아래꺼랑 리팩토링
-        String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ?";
+    public List<Integer> getDeliveryIdList(String status) throws SQLException {
+        String sql = "SELECT delivery_id FROM Delivery WHERE delivery_person_id = ? AND status = ?";
         List<Integer> deliveryIdList = new ArrayList<>();
 
         PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
         preparedStatement.setInt(1, userId);
+        preparedStatement.setString(2, status);
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while(resultSet.next()){
@@ -206,7 +211,6 @@ public class DeliveryPerson {
             return null;
         }
     }
-
 
     public String getRestaurantAddress(int restaurantId) {
         String sql = "SELECT address FROM Restaurant  WHERE restaurant_id = ?";
