@@ -186,29 +186,24 @@ class Main {
 
         while (true) {
             System.out.println("관리자님, 환영합니다! 아래 옵션 중 선택해 주세요:");
-            System.out.println("1. 유저 계정 등록");
-            System.out.println("2. 유저 계정 수정");
-            System.out.println("3. 유저 계정 삭제");
-            System.out.println("4. 로그아웃");
+            System.out.println("1. 유저 계정 수정");
+            System.out.println("2. 유저 계정 삭제");
+            System.out.println("3. 로그아웃");
 
             Scanner scanner = new Scanner(System.in);
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 4) {
+            if (option == 3) {
                 break;
             }
 
             switch (option) {
                 case 1:
-                    serviceProvider.registerUserService();
-                    break;
-
-                case 2:
                     serviceProvider.updateUserService();
                     break;
 
-                case 3:
+                case 2:
                     serviceProvider.deleteUserService();
                     break;
 

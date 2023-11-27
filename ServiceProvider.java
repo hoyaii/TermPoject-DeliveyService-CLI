@@ -188,6 +188,8 @@ public class ServiceProvider {
         } while (newRole == null);
 
         updateUser(userId, newName, newPassword, newRole);
+
+        System.out.println("수정이 완료되었습니다!");
     }
 
     public void deleteUserService(){
@@ -212,6 +214,8 @@ public class ServiceProvider {
         int userId = getUserIdByEmail(email);
 
         deleteUser(userId);
+
+        System.out.println("삭제가 완료되었습니다!");
     }
 
     public boolean login(String email, String password) {
