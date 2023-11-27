@@ -68,6 +68,7 @@ public class DeliveryPerson {
 
         Integer orderId = getOrderIdByDeliveryId(deliveryId, "cooked"); // deliveryId를 가지고 orderId를 구한다
 
+
         updateDeliveryStatus("finished", deliveryId);
         updateOrderStatus("finished", orderId);
         updateUserStatus("free");

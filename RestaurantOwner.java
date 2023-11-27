@@ -33,12 +33,16 @@ public class RestaurantOwner {
             address = scanner.nextLine();
         }
 
-        System.out.println("등록할 음식점의 음식 종류를 입력해 주세요:");
-        String cuisineType = scanner.nextLine();
-        while(cuisineType == null || cuisineType.isEmpty()){
-            System.out.println("아무것도 입력하지 않으셨습니다.");
+        String cuisineType;
+        do {
+            System.out.println("음식점의 새로운 카테고리를 입력해 주세요:");
             cuisineType = scanner.nextLine();
-        }
+
+            if (!cuisineType.equals("양식") && !cuisineType.equals("한식") && !cuisineType.equals("일식") && !cuisineType.equals("중식") && !cuisineType.equals("패스트푸드") && !cuisineType.equals("기타")) {
+                System.out.println("카테고리는 '양식', '한식', '일식', '중식', '패스트푸드', '기타' 중 고르셔야 합니다. 다시 작성해주세요.");
+                cuisineType = null;
+            }
+        } while (cuisineType == null);
 
         String serviceArea;
         do {
@@ -93,12 +97,16 @@ public class RestaurantOwner {
             newAddress = scanner.nextLine();
         }
 
-        System.out.println("음식점의 새로운 카테고리를 입력해 주세요:");
-        String newCuisineType = scanner.nextLine();
-        while(newCuisineType == null || newCuisineType.isEmpty()){
-            System.out.println("아무것도 입력하지 않으셨습니다.");
+        String newCuisineType;
+        do {
+            System.out.println("음식점의 새로운 카테고리를 입력해 주세요:");
             newCuisineType = scanner.nextLine();
-        }
+
+            if (!newCuisineType.equals("양식") && !newCuisineType.equals("한식") && !newCuisineType.equals("일식") && !newCuisineType.equals("중식") && !newCuisineType.equals("패스트푸드") && !newCuisineType.equals("기타")) {
+                System.out.println("카테고리는 '양식', '한식', '일식', '중식', '패스트푸드', '기타' 중 고르셔야 합니다. 다시 작성해주세요.");
+                newCuisineType = null;
+            }
+        } while (newCuisineType == null);
 
         String newServiceArea;
         do {

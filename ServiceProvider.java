@@ -307,6 +307,23 @@ public class ServiceProvider {
         }
     }
 
+    public String getNameById(int userId) {
+        String sql = "SELECT username FROM User WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("username");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
     public void addDeliveryPersonInfo(int userId, String serviceArea) {
         String sql = "UPDATE User SET service_area = ?, status = 'free' WHERE user_id = ?";
         try {

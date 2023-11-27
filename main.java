@@ -27,11 +27,11 @@ class Main {
                 Runnable handler = null;
 
                 if (role.equals("Customer")) {
-                    handler = () -> handleCustomer(db, userId);
+                    handler = () -> handleCustomer(serviceProvider, db, userId);
                 } else if (role.equals("RestaurantOwner")) {
-                    handler = () -> handleRestaurantOwner(db, userId);
+                    handler = () -> handleRestaurantOwner(serviceProvider, db, userId);
                 } else if (role.equals("DeliveryPerson")) {
-                    handler = () -> handleDeliveryPerson(db, userId);
+                    handler = () -> handleDeliveryPerson(serviceProvider, db, userId);
                 } else if (role.equals("ServiceProvider")){
                     handler = () -> handleServiceProvider(db);
                 }
@@ -49,11 +49,12 @@ class Main {
         }
     }
 
-    public static void handleCustomer(Database db, int userId) {
+    public static void handleCustomer(ServiceProvider serviceProvider, Database db, int userId) {
         Customer customer = new Customer(db, userId);
+        String userName = serviceProvider.getNameById(userId);
 
         while(true) {
-            System.out.println("고객님, 환영합니다! 아래 옵션 중 선택해 주세요:");
+            System.out.println(userName + " 고객님, 환영합니다! 아래 옵션 중 선택해 주세요:");
             System.out.println("1. 음식점 검색과 주문");
             System.out.println("2. 배달 상태 확인");
             System.out.println("3. 리뷰 작성");
@@ -87,16 +88,17 @@ class Main {
         }
     }
 
-    public static void handleRestaurantOwner(Database db, int userId) {
+    public static void handleRestaurantOwner(ServiceProvider serviceProvider, Database db, int userId) {
         RestaurantOwner restaurantOwner = new RestaurantOwner(db, userId);
+        String userName = serviceProvider.getNameById(userId);
 
         while (true) {
-            System.out.println("사장님, 환영합니다! 아래 옵션 중 선택해 주세요:");
+            System.out.println(userName + " 사장님, 환영합니다! 아래 옵션 중 선택해 주세요:");
             System.out.println("1. 음식점 정보 등록");
             System.out.println("2. 음식점 정보 업데이트");
             System.out.println("3. 메뉴 관리");
-            System.out.println("4. 조리 완료 처리하기");
-            System.out.println("5. 주문 내역과 상태 조회");
+            System.out.println("4. 조리 완료 처리");
+            System.out.println("5. 주문 요청/내역 조회");
             System.out.println("6. 리뷰 확인");
             System.out.println("7. 로그아웃");
 
@@ -140,11 +142,12 @@ class Main {
         }
     }
 
-    public static void handleDeliveryPerson(Database db, int userId) {
+    public static void handleDeliveryPerson(ServiceProvider serviceProvider, Database db, int userId) {
         DeliveryPerson deliveryPerson = new DeliveryPerson(db, userId);
+        String userName = serviceProvider.getNameById(userId);
 
         while (true) {
-            System.out.println("배달원님, 환영합니다! 아래 옵션 중 선택해 주세요:");
+            System.out.println(userName + " 배달원님, 환영합니다! 아래 옵션 중 선택해 주세요:");
             System.out.println("1. 배달 요청 확인 및 수락");
             System.out.println("2. 배달 완료 처리하기");
             System.out.println("3. 완료한 배달 이력 확인");

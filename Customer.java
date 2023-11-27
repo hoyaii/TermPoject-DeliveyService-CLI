@@ -26,8 +26,16 @@ public class Customer {
             }
         } while (serviceArea == null);
 
-        System.out.println("검색하실 음식의 종류를 입력해 주세요: (옵션)");
-        String type = scanner.nextLine();
+        String type;
+        do {
+            System.out.println("검색하실 음식의 종류를 입력해 주세요: (옵션)");
+            type = scanner.nextLine();
+
+            if (!type.equals("양식") && !type.equals("한식") && !type.equals("일식") && !type.equals("중식") && !type.equals("패스트푸드") && !type.equals("기타")) {
+                System.out.println("카테고리는 '양식', '한식', '일식', '중식', '패스트푸드', '기타' 중 고르셔야 합니다. 다시 작성해주세요.");
+                type = null;
+            }
+        } while (type == null);
 
         System.out.println("검색하실 음식점의 이름을 입력해 주세요: (옵션)");
         String name = scanner.nextLine();
