@@ -169,16 +169,24 @@ public class RestaurantOwner {
                 break;
 
             case 2:
-                int menuSize = printMenuList(restaurantId);
+                ResultSet menuSet = getMenuByRestaurantId(restaurantId);
+                List<Integer> menuIdList = printMenuList(menuSet);
 
-                System.out.println("수정할 메뉴의 ID를 입력해 주세요:");
-                int menuId = scanner.nextInt();
-                scanner.nextLine();
-                while(menuId < 0 && menuId > menuSize){
-                    System.out.println("유요하지 않은 ID 입니다.");
+               if(menuIdList.isEmpty()){
+                   System.out.println("등록되어 있는 메뉴가 존재하지 않습니다.");
+                   return;
+               }
+
+                Integer menuId;
+                do {
+                    System.out.println("수정할 메뉴의 ID를 입력해 주세요:");
                     menuId = scanner.nextInt();
                     scanner.nextLine();
-                }
+
+                    if(!menuIdList.contains(menuId)){
+                        System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
+                    }
+                } while(!menuIdList.contains(menuId));
 
                 System.out.println("새로운 이름을 입력해 주세요:");
                 String newName = scanner.nextLine();
@@ -200,16 +208,23 @@ public class RestaurantOwner {
                 break;
 
             case 3:
-                menuSize = printMenuList(restaurantId);
+                menuSet = getMenuByRestaurantId(restaurantId);
+                menuIdList = printMenuList(menuSet);
 
-                System.out.println("삭제할 메뉴의 ID를 입력해 주세요:");
-                menuId = scanner.nextInt();
-                scanner.nextLine();
-                while(menuId < 0 && menuId > menuSize){
-                    System.out.println("유요하지 않은 ID 입니다.");
+                if(menuIdList.isEmpty()){
+                    System.out.println("등록되어 있는 메뉴가 존재하지 않습니다.");
+                    return;
+                }
+
+                do {
+                    System.out.println("삭제할 메뉴의 ID를 입력해 주세요:");
                     menuId = scanner.nextInt();
                     scanner.nextLine();
-                }
+
+                    if(!menuIdList.contains(menuId)){
+                        System.out.println("선택하신 메뉴 ID는 유효하지 않습니다.");
+                    }
+                } while(!menuIdList.contains(menuId));
 
                 deleteMenu(menuId);
                 break;
@@ -418,31 +433,23 @@ public class RestaurantOwner {
         return restaurantIdList;
     }
 
-    public List<String> getMenuList(int restaurantId){
-        String sql = "SELECT name FROM Menu WHERE restaurant_id = ?";
-        List<String> menuNameList = new ArrayList<>();
-        try{
-            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
-            preparedStatement.setInt(1, restaurantId);
+    public List<Integer> printMenuList(ResultSet resultSet){
+        List<Integer> menuNameList = new ArrayList<>();
 
-            ResultSet resultSet = preparedStatement.executeQuery();
+        try{
             while(resultSet.next()){
-                menuNameList.add(resultSet.getString("name"));
+                int menuId = resultSet.getInt("menu_id");
+                String name = resultSet.getString("name");
+
+                System.out.println("메뉴 ID: " + menuId + "| 메뉴명: " + name);
+
+                menuNameList.add(menuId);
             }
         } catch (SQLException e) {
             handleSQLException(e);
         }
 
         return menuNameList;
-    }
-
-    public int printMenuList(int restaurantId){
-        List<String> menuNameList = getMenuList(restaurantId);
-        for(int i = 0; i < menuNameList.size(); i++){
-            System.out.println(i + ". " + menuNameList.get(i));
-        }
-
-        return menuNameList.size();
     }
 
     public void updateOrderStatus(int orderId, String status) {
@@ -565,6 +572,18 @@ public class RestaurantOwner {
             } else {
                 return null;
             }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
+    public ResultSet getMenuByRestaurantId(int restaurantId) {
+        String sql = "SELECT * FROM Menu WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            return preparedStatement.executeQuery();
         } catch (SQLException e) {
             handleSQLException(e);
             return null;
