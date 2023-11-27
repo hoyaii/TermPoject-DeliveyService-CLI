@@ -8,7 +8,7 @@ import java.util.*;
 
 public class Customer {
     private Database db;
-    private Scanner           scanner;
+    private Scanner scanner;
     private int userId;
 
     public Customer(Database db, int userId) {
@@ -29,7 +29,7 @@ public class Customer {
             }
         } while (serviceArea == null);
 
-        System.out.println("검색하실 음식점의 음식 종류를 입력해 주세요: (옵션)");
+        System.out.println("검색하실 음식의 종류를 입력해 주세요: (옵션)");
         String type = scanner.nextLine();
 
         System.out.println("검색하실 음식점의 이름을 입력해 주세요: (옵션)");
@@ -60,7 +60,8 @@ public class Customer {
         ResultSet resultSet = getMenu(restaurantId);
         List<Integer> menuIdList = printMenuList(resultSet); // 메뉴들 출력
 
-        if(menuIdList.isEmpty()){ // 주문이 없는 경우
+        if(menuIdList.isEmpty()){ // 메뉴가 없는 경우
+            System.out.println("메뉴가 준비되어 있지 않습니다. 나중에 다시 시도해주세요!:");
             return;
         }
 
@@ -80,11 +81,13 @@ public class Customer {
         boolean requestSuccess = requestDeliveryService(restaurantId, address); // 배달 요청 -> 배달 기사 없으면 실패
         if (!requestSuccess) {
             System.out.println("주문에 실패하였습니다.");
+            return;
         }
 
         boolean orderSuccess = createOrder(restaurantId, menuId); // 주문 생성
         if (!orderSuccess) {
             System.out.println("주문에 실패하였습니다.");
+            return;
         }
 
         System.out.println("주문이 성공적으로 요청되었습니다.");
@@ -408,6 +411,7 @@ public class Customer {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setString(1, serviceArea);
             ResultSet resultSet = preparedStatement.executeQuery();
+
             while (resultSet.next()) {
                 availableDeliveryPersons.add(resultSet.getInt("delivery_person_id"));
             }
@@ -425,7 +429,7 @@ public class Customer {
             preparedStatement.setInt(1, restaurantId);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
-                return resultSet.getString("restaurant_id");
+                return resultSet.getString("service_area");
             } else {
                 return null;
             }
