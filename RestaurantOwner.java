@@ -35,7 +35,7 @@ public class RestaurantOwner {
 
         String cuisineType;
         do {
-            System.out.println("음식점의 새로운 카테고리를 입력해 주세요:");
+            System.out.println("음식점의 새로운 카테고리를 입력해 주세요: (양식, 한식, 일식, 중식, 패스트푸드, 기타)");
             cuisineType = scanner.nextLine();
 
             if (!cuisineType.equals("양식") && !cuisineType.equals("한식") && !cuisineType.equals("일식") && !cuisineType.equals("중식") && !cuisineType.equals("패스트푸드") && !cuisineType.equals("기타")) {
@@ -46,7 +46,7 @@ public class RestaurantOwner {
 
         String serviceArea;
         do {
-            System.out.println("배달 서비스를 제공할 지역을 입력해 주세요:");
+            System.out.println("배달 서비스를 제공할 지역을 입력해 주세요: (서울, 부산, 대구, 대전, 광주, 울산)");
             serviceArea = scanner.nextLine();
 
             if (!serviceArea.equals("서울") && !serviceArea.equals("부산") && !serviceArea.equals("대구") && !serviceArea.equals("대전") && !serviceArea.equals("광주") && !serviceArea.equals("울산")) {

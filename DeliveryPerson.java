@@ -77,9 +77,31 @@ public class DeliveryPerson {
         System.out.println("배달 완료 처리가 되었습니다.");
     }
 
+    public void printDeliveryHistoryService() {
+        try {
+            List<Integer> deliveryIdList = getDeliveryIdList("finished");
+
+            System.out.println("지금까지 " + deliveryIdList.size() + " 번 배달을 완료하셨습니다!");
+
+            if(deliveryIdList.isEmpty()){
+                System.out.println("배달 내역이 존재하지 않습니다.");
+            }
+
+            for (int deliveryId : deliveryIdList) {
+                printSingleDeliveryHistory(deliveryId);
+            }
+
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public void updateSales(int orderId){
         int price = getPriceByOrderId(orderId);
         updateSalesPrice(orderId, price);
+        updateSalesNum(price);
     }
 
     public void updateSalesPrice(int orderId, int price) {
@@ -88,6 +110,17 @@ public class DeliveryPerson {
             PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
             preparedStatement.setInt(1, price);
             preparedStatement.setInt(2, orderId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public void updateSalesNum(int orderId) {
+        String sql = "UPDATE Restaurant SET sales_num = sales_num + 1 WHERE restaurant_id = (SELECT restaurant_id FROM Orders WHERE order_id = ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             handleSQLException(e);
@@ -108,25 +141,6 @@ public class DeliveryPerson {
         } catch (SQLException e) {
             handleSQLException(e);
             return null;
-        }
-    }
-
-    public void printDeliveryHistoryService() {
-        try {
-            List<Integer> deliveryIdList = getDeliveryIdList("finished");
-
-            System.out.println("지금까지 " + deliveryIdList.size() + " 번 배달을 완료하셨습니다!");
-
-            if(deliveryIdList.isEmpty()){
-                System.out.println("배달 내역이 존재하지 않습니다.");
-            }
-
-            for (int deliveryId : deliveryIdList) {
-                printSingleDeliveryHistory(deliveryId);
-            }
-
-        } catch (SQLException e) {
-            handleSQLException(e);
         }
     }
 

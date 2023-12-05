@@ -199,13 +199,21 @@ public class Customer {
 
         if(response == 1){
             registerFavorite(orderId);
+            System.out.println("즐겨찾기에 등록되었습니다!");
         }
     }
 
     public void getFavoriteService(){
         ResultSet resultSet = getFavoritesByUserId(userId);
+        if(resultSet == null){
+            System.out.println("즐겨찾기에 등록한 목록이 존재하지 않습니다.");
+            return;
+        }
+
         printFavoriteNames(resultSet);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////
 
     public ResultSet getFavoritesByUserId(int userId) {
         String sql = "SELECT * FROM Favorite WHERE user_id = ?";
@@ -226,7 +234,7 @@ public class Customer {
                 int menuId = favorites.getInt("menu_id");
                 String restaurantName = getRestaurantName(restaurantId);
                 String menuName = getMenuName(menuId);
-                System.out.println("즐겨 찾으시는 식당 이름은 " + restaurantName + "이고, 메뉴명은 " + menuName);
+                System.out.println("즐겨 찾으시는 식당 이름은 " + restaurantName + "이고, 메뉴명은 " + menuName + " 입니다!");
             }
         } catch (SQLException e) {
             handleSQLException(e);

@@ -84,6 +84,7 @@ class Main {
 
                 case 4:
                     customer.getFavoriteService();
+                    break;
 
                 default:
                     System.out.println("잘못된 선택입니다.");

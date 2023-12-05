@@ -125,7 +125,7 @@ public class ServiceProvider {
 
             String serviceArea;
             do {
-                System.out.println("배달 지역을 입력해 주세요:");
+                System.out.println("배달 지역을 입력해 주세요: (서울, 부산, 대구, 대전, 광주, 울산)");
                 serviceArea = scanner.nextLine();
 
                 if (!serviceArea.equals("서울") && !serviceArea.equals("부산") && !serviceArea.equals("대구") && !serviceArea.equals("대전") && !serviceArea.equals("광주") && !serviceArea.equals("울산")) {
@@ -178,7 +178,7 @@ public class ServiceProvider {
 
         String newRole;
         do {
-            System.out.println("새로운 역할을 입력해 주세요:");
+            System.out.println("새로운 역할을 입력해 주세요: (Customer, RestaurantOwner, DeliveryPerson, ServiceProvider)");
             newRole = scanner.nextLine();
 
             if (!newRole.equals("Customer") && !newRole.equals("RestaurantOwner") && !newRole.equals("DeliveryPerson") && !newRole.equals("ServiceProvider")) {
