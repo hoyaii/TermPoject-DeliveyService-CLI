@@ -3,7 +3,7 @@ import java.util.Scanner;
 class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Database db = new Database("jdbc:mysql://localhost:3306/dbTermProject", "root", "0623");
+        Database db = new Database("jdbc:mysql://localhost:3306/dbTermProject2", "root", "0623");
 
         ServiceProvider serviceProvider = new ServiceProvider(db);
 
@@ -100,13 +100,14 @@ class Main {
             System.out.println("4. 조리 완료 처리");
             System.out.println("5. 주문 요청/내역 조회");
             System.out.println("6. 리뷰 확인");
-            System.out.println("7. 로그아웃");
+            System.out.println("7. 매출/판매량 확인");
+            System.out.println("8. 로그아웃");
 
             Scanner scanner = new Scanner(System.in);
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 7) {
+            if (option == 8) {
                 break;
             }
 
@@ -134,6 +135,9 @@ class Main {
                 case 6:
                     restaurantOwner.printReviewService();
                     break;
+
+                case 7:
+                    restaurantOwner.printSalesService();
 
                 default:
                     System.out.println("잘못된 선택입니다.");

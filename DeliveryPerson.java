@@ -68,12 +68,47 @@ public class DeliveryPerson {
 
         Integer orderId = getOrderIdByDeliveryId(deliveryId, "cooked"); // deliveryId를 가지고 orderId를 구한다
 
-
         updateDeliveryStatus("finished", deliveryId);
         updateOrderStatus("finished", orderId);
         updateUserStatus("free");
 
+        updateSales(orderId); // 모든 과정이 완료되었으니, 정산이 진행되서 식당의 매출에 반영된다.
+
         System.out.println("배달 완료 처리가 되었습니다.");
+    }
+
+    public void updateSales(int orderId){
+        int price = getPriceByOrderId(orderId);
+        updateSalesPrice(orderId, price);
+    }
+
+    public void updateSalesPrice(int orderId, int price) {
+        String sql = "UPDATE Restaurant SET sales_price = sales_price + ? WHERE restaurant_id = (SELECT restaurant_id FROM Orders WHERE order_id = ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, price);
+            preparedStatement.setInt(2, orderId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public Integer getPriceByOrderId(int orderId) {
+        String sql = "SELECT price FROM Menu WHERE menu_id = (SELECT menu_id FROM Orders WHERE order_id = ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("price");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
     }
 
     public void printDeliveryHistoryService() {
