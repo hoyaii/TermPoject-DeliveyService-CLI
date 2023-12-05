@@ -58,13 +58,14 @@ class Main {
             System.out.println("1. 음식점 검색과 주문");
             System.out.println("2. 배달 상태 확인");
             System.out.println("3. 리뷰 작성");
-            System.out.println("4. 로그아웃");
+            System.out.println("4. 즐겨찾기 조회");
+            System.out.println("5. 로그아웃");
 
             Scanner scanner = new Scanner(System.in);
             int option = scanner.nextInt();
             scanner.nextLine();
 
-            if (option == 4) {
+            if (option == 5) {
                 break;
             }
 
@@ -80,6 +81,9 @@ class Main {
                 case 3:
                     customer.writeReviewService();
                     break;
+
+                case 4:
+                    customer.getFavoriteService();
 
                 default:
                     System.out.println("잘못된 선택입니다.");

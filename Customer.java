@@ -14,7 +14,7 @@ public class Customer {
         this.userId = userId;
     }
 
-    public void searchRestaurantsService(){ // ***************** 3가지 쿼리 기능 테스트 필요
+    public void searchRestaurantsService(){
         String serviceArea;
         do {
             System.out.println("검색하실 음식점의 지역을 입력해 주세요:");
@@ -60,6 +60,8 @@ public class Customer {
         } while(!restaurantIdList.contains(restaurantId));
 
         orderService(restaurantId);
+
+
     }
 
     public void orderService(int restaurantId){
@@ -184,6 +186,142 @@ public class Customer {
         } while (comment.trim().isEmpty());
 
         createReview(orderId, userId, rating, comment);
+
+        System.out.println("즐겨찾기로 등록하시겠습니까?");
+        int response;
+        do {
+            System.out.println("즐겨찾기 찾기로 등록하려면 1, 종료를 원하면 2를 입력해 주세요");
+            response = scanner.nextInt();
+            if (response != 1 && response != 2) {
+                System.out.println("잘못 입력하셨습니다. 1 혹 2를 입력해 주세요.");
+            }
+        } while (response != 1 && response != 2);
+
+        if(response == 1){
+            registerFavorite(orderId);
+        }
+    }
+
+    public void getFavoriteService(){
+        ResultSet resultSet = getFavoritesByUserId(userId);
+        printFavoriteNames(resultSet);
+    }
+
+    public ResultSet getFavoritesByUserId(int userId) {
+        String sql = "SELECT * FROM Favorite WHERE user_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            return preparedStatement.executeQuery();
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
+    public void printFavoriteNames(ResultSet favorites) {
+        try {
+            while (favorites.next()) {
+                int restaurantId = favorites.getInt("restaurant_id");
+                int menuId = favorites.getInt("menu_id");
+                String restaurantName = getRestaurantName(restaurantId);
+                String menuName = getMenuName(menuId);
+                System.out.println("즐겨 찾으시는 식당 이름은 " + restaurantName + "이고, 메뉴명은 " + menuName);
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+        }
+    }
+
+    public String getRestaurantName(int restaurantId) {
+        String sql = "SELECT name FROM Restaurant WHERE restaurant_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, restaurantId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                return resultSet.getString("name");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
+    public String getMenuName(int menuId) {
+        String sql = "SELECT name FROM Menu WHERE menu_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, menuId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getString("name");
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        }
+    }
+
+    public void registerFavorite(int orderId){
+        int restaurantId = getRestaurantIdByOrderId(orderId);
+        int menuId = getMenuIdByOrderId(orderId);
+
+        addFavorite(userId, restaurantId, menuId);
+    }
+
+    public boolean addFavorite(int userId, int restaurantId, int menuId) {
+        String sql = "INSERT INTO Favorite (user_id, restaurant_id, menu_id) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, restaurantId);
+            preparedStatement.setInt(3, menuId);
+            int affectedRows = preparedStatement.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return false;
+        }
+    }
+
+    public int getRestaurantIdByOrderId(int orderId) {
+        String sql = "SELECT restaurant_id FROM Orders WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("restaurant_id");
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return -1;
+        }
+    }
+
+    public int getMenuIdByOrderId(int orderId) {
+        String sql = "SELECT menu_id FROM Orders WHERE order_id = ?";
+        try {
+            PreparedStatement preparedStatement = this.db.connection.prepareStatement(sql);
+            preparedStatement.setInt(1, orderId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("menu_id");
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return -1;
+        }
     }
 
     public ResultSet getRestaurants(String name, String serviceArea, String cuisineType) {
